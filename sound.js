@@ -40,9 +40,9 @@ export function playCorrect() {
   try {
     const c = context();
     if (!c) return;
-    tone(c, C6, 0, 0.06, 'square', 0.08);
-    tone(c, E6, 0.06, 0.06, 'square', 0.08);
-    tone(c, G6, 0.12, 0.14, 'square', 0.08);
+    tone(c, C6, 0, 0.06, 'square', 0.32);
+    tone(c, E6, 0.06, 0.06, 'square', 0.32);
+    tone(c, G6, 0.12, 0.14, 'square', 0.32);
   } catch { /* ignore */ }
 }
 
@@ -51,8 +51,8 @@ export function playWrong() {
   try {
     const c = context();
     if (!c) return;
-    tone(c, G4, 0, 0.09, 'sine', 0.25);
-    tone(c, E4, 0.08, 0.09, 'sine', 0.25);
-    tone(c, C4, 0.16, 0.18, 'sine', 0.25);
+    tone(c, G4, 0, 0.09, 'sine', 1.0);
+    tone(c, E4, 0.08, 0.09, 'sine', 1.0);
+    tone(c, C4, 0.16, 0.18, 'sine', 1.0);
   } catch { /* ignore */ }
 }
