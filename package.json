@@ -1,0 +1,20 @@
+{
+  "name": "mala-nasobilka",
+  "version": "1.0.0",
+  "description": "Tréning malej násobilky s meraním rýchlosti",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "playwright test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
+  },
+  "private": true
+}

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="sk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#1d4ed8" />
+  <title>Malá násobilka</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="notice" class="notice" hidden></div>
+
+  <!-- Profiles -->
+  <section id="screen-profiles" class="screen">
+    <h1>Kto hrá?</h1>
+    <div id="profile-list" class="profile-list"></div>
+    <form id="form-add-profile" class="row" autocomplete="off">
+      <input id="new-profile-name" type="text" placeholder="Meno" maxlength="20" required />
+      <button id="btn-add-profile" type="submit" class="btn primary">Pridať</button>
+    </form>
+  </section>
+
+  <!-- Home -->
+  <section id="screen-home" class="screen" hidden>
+    <h1 id="home-name"></h1>
+    <p id="home-summary" class="muted"></p>
+    <div class="stack">
+      <button id="btn-start" class="btn primary big">Štart kola</button>
+      <button id="btn-stats" class="btn big">Štatistiky</button>
+      <button id="btn-settings" class="btn big">Nastavenia</button>
+      <button id="btn-switch-profile" class="btn link">Zmeniť profil</button>
+    </div>
+  </section>
+
+  <!-- Settings -->
+  <section id="screen-settings" class="screen" hidden>
+    <h1>Nastavenia</h1>
+    <form id="form-settings" class="form">
+      <label>Počet príkladov v kole
+        <input id="set-count" type="number" min="5" max="200" step="1" required />
+      </label>
+      <label>Operácie
+        <select id="set-ops">
+          <option value="both">Násobenie aj delenie</option>
+          <option value="mul">Len násobenie</option>
+          <option value="div">Len delenie</option>
+        </select>
+      </label>
+      <label>Zelená do (sekundy)
+        <input id="set-green" type="number" min="0.5" max="30" step="0.5" required />
+      </label>
+      <label>Oranžová do (sekundy)
+        <input id="set-orange" type="number" min="1" max="60" step="0.5" required />
+      </label>
+      <div class="row">
+        <button id="btn-save-settings" type="submit" class="btn primary">Uložiť</button>
+        <button id="btn-cancel-settings" type="button" class="btn">Späť</button>
+      </div>
+    </form>
+    <h2>Dáta</h2>
+    <div class="stack">
+      <button id="btn-export" class="btn">Export JSON</button>
+      <label class="btn file-btn">Import JSON
+        <input id="import-file" type="file" accept="application/json,.json" hidden />
+      </label>
+      <button id="btn-wipe" class="btn danger">Zmazať všetky dáta profilu</button>
+      <button id="btn-wipe-confirm" class="btn danger" hidden>Naozaj zmazať?</button>
+    </div>
+  </section>
+
+  <!-- Round -->
+  <section id="screen-round" class="screen round" hidden>
+    <header class="round-header">
+      <span id="progress" class="progress"></span>
+      <button id="btn-abort" class="btn small">Prerušiť</button>
+    </header>
+    <div id="question" class="question"></div>
+    <div id="answer-display" class="answer-display">&nbsp;</div>
+    <div id="feedback" class="feedback"></div>
+    <div class="numpad">
+      <button data-key="7">7</button><button data-key="8">8</button><button data-key="9">9</button>
+      <button data-key="4">4</button><button data-key="5">5</button><button data-key="6">6</button>
+      <button data-key="1">1</button><button data-key="2">2</button><button data-key="3">3</button>
+      <button data-key="back" class="back">⌫</button><button data-key="0">0</button><button data-key="ok" class="ok">OK</button>
+    </div>
+  </section>
+
+  <!-- Summary -->
+  <section id="screen-summary" class="screen" hidden>
+    <h1>Hotovo!</h1>
+    <p id="summary-text" class="summary-text"></p>
+    <h2>Najpomalšie</h2>
+    <ol id="summary-slowest" class="slowest"></ol>
+    <div class="stack">
+      <button id="btn-again" class="btn primary big">Ešte raz</button>
+      <button id="btn-summary-stats" class="btn big">Štatistiky</button>
+      <button id="btn-summary-home" class="btn link">Domov</button>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section id="screen-stats" class="screen stats" hidden>
+    <header class="row space">
+      <h1>Štatistiky</h1>
+      <button id="btn-stats-home" class="btn small">Domov</button>
+    </header>
+    <nav class="tabs" id="stats-tabs">
+      <button data-tab="heatmap" class="tab active">Heatmapa</button>
+      <button data-tab="histogram" class="tab">Histogram</button>
+      <button data-tab="trend" class="tab">Vývoj</button>
+    </nav>
+
+    <div id="tab-heatmap" class="tab-panel">
+      <div class="row">
+        <div class="segment" id="heatmap-op">
+          <button data-op="mul" class="active">Násobenie</button>
+          <button data-op="div">Delenie</button>
+        </div>
+      </div>
+      <div id="heatmap" class="heatmap"></div>
+      <p class="legend">
+        <span class="sw green"></span> rýchlo
+        <span class="sw orange"></span> pomalšie
+        <span class="sw red"></span> pomaly
+        <span class="sw none"></span> ešte nehrané
+        <span class="sw dot"></span> chyba v posledných 5
+      </p>
+      <div id="fact-history" class="fact-history" hidden></div>
+    </div>
+
+    <div id="tab-histogram" class="tab-panel" hidden>
+      <div class="row space">
+        <div class="segment" id="hist-filter">
+          <button data-filter="last" class="active">Posledné kolo</button>
+          <button data-filter="all">Všetko</button>
+        </div>
+        <span id="hist-total" class="muted"></span>
+      </div>
+      <svg id="histogram" class="chart" viewBox="0 0 640 320" role="img" aria-label="Histogram časov odpovedí"></svg>
+    </div>
+
+    <div id="tab-trend" class="tab-panel" hidden>
+      <p class="muted">Medián času (čiara) a chybovosť (stĺpce) po kolách.</p>
+      <svg id="trend" class="chart" viewBox="0 0 640 320" role="img" aria-label="Vývoj po kolách"></svg>
+    </div>
+  </section>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
