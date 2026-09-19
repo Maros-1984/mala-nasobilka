@@ -55,6 +55,7 @@ body {
   flex-direction: column;
   gap: 16px;
 }
+.screen[hidden], [hidden] { display: none !important; }
 h1 { font-size: 2rem; margin: 0; }
 h2 { font-size: 1.25rem; margin: 8px 0 0; }
 .muted { color: var(--text-2); margin: 0; }
