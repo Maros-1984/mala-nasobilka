@@ -244,7 +244,7 @@ $('#import-file').addEventListener('change', async (e) => {
 
 // ---------- round ----------
 
-let round = null; // { queue, index, answers, shownAt, typed, locked, startedAt }
+let round = null; // { queue, index, answers, shownAt, typed, firstTry, locked, startedAt }
 
 function startRound() {
   const p = activeProfile();
@@ -254,6 +254,7 @@ function startRound() {
     answers: [],
     shownAt: 0,
     typed: '',
+    firstTry: null,
     locked: false,
     startedAt: Date.now(),
   };
@@ -269,7 +270,9 @@ function showQuestion() {
   qEl.dataset.a = String(q.a);
   qEl.dataset.b = String(q.b);
   round.typed = '';
+  round.firstTry = null;
   renderTyped();
+  $('.numpad .ok').classList.remove('hint');
   $('#feedback').textContent = '';
   $('#progress').textContent = `${round.index + 1} / ${round.queue.length}`;
   round.locked = false;
@@ -295,6 +298,14 @@ function pressKey(key) {
     if (round.typed === '' && key === '0') return;
     round.typed += key;
     renderTyped();
+    const q = round.queue[round.index];
+    const answer = String(answerOf(q.op, q.a, q.b));
+    if (round.typed === answer) {
+      submitAnswer();
+    } else if (round.typed.length >= answer.length) {
+      if (round.firstTry == null) round.firstTry = Number(round.typed);
+      $('.numpad .ok').classList.add('hint');
+    }
   }
 }
 
@@ -309,7 +320,9 @@ function submitAnswer() {
   const q = round.queue[round.index];
   const given = Number(round.typed);
   const correct = given === answerOf(q.op, q.a, q.b);
-  round.answers.push({ op: q.op, a: q.a, b: q.b, given, correct, ms });
+  const rec = { op: q.op, a: q.a, b: q.b, given, correct, ms };
+  if (round.firstTry != null && round.firstTry !== given) rec.firstTry = round.firstTry;
+  round.answers.push(rec);
   round.locked = true;
   const screen = $('#screen-round');
   if (correct) {
@@ -351,7 +364,7 @@ function finishRound() {
     `${errors} ${plural(errors, 'chyba', 'chyby', 'chyb')}, medián ${formatSeconds(median(answers.map((x) => x.ms)))}.`;
   const slowest = [...answers].sort((x, y) => y.ms - x.ms).slice(0, 3);
   $('#summary-slowest').innerHTML = slowest
-    .map((x) => `<li>${questionText(x.op, x.a, x.b)} = ${answerOf(x.op, x.a, x.b)} — ${formatSeconds(x.ms)}${x.correct ? '' : ' (chyba)'}</li>`)
+    .map((x) => `<li>${questionText(x.op, x.a, x.b)} = ${answerOf(x.op, x.a, x.b)} — ${formatSeconds(x.ms)}${x.correct ? '' : ' (chyba)'}${x.correct && x.firstTry != null ? ` (nejdřív ${x.firstTry})` : ''}</li>`)
     .join('');
   round = null;
   showScreen('screen-summary');

@@ -162,6 +162,8 @@ input[type="text"], input[type="number"], select {
 .numpad button:active { transform: translateY(1px); background: var(--bg); }
 .numpad .ok { background: var(--primary); color: var(--primary-ink); border-color: var(--primary); }
 .numpad .back { color: var(--text-2); }
+.numpad .ok.hint { animation: ok-pulse 0.9s ease-in-out infinite; }
+@keyframes ok-pulse { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 35%, transparent); } }
 
 /* Summary */
 .summary-text { font-size: 1.4rem; margin: 0; }
@@ -212,6 +214,10 @@ input[type="text"], input[type="number"], select {
   content: ""; position: absolute; top: 3px; right: 3px; width: 7px; height: 7px;
   border-radius: 50%; background: var(--red); border: 1px solid var(--surface);
 }
+.cell.fix::after {
+  content: ""; position: absolute; top: 3px; right: 3px; width: 7px; height: 7px;
+  border-radius: 50%; background: var(--orange); border: 1px solid var(--surface);
+}
 .cell.selected { outline: 3px solid var(--primary); outline-offset: -1px; }
 .legend { display: flex; gap: 6px 14px; align-items: center; flex-wrap: wrap; font-size: 0.9rem; color: var(--text-2); margin: 0; }
 .sw { display: inline-block; width: 14px; height: 14px; border-radius: 4px; margin-right: 4px; vertical-align: -2px; }
@@ -220,6 +226,7 @@ input[type="text"], input[type="number"], select {
 .sw.red { background: color-mix(in srgb, var(--red) 45%, var(--surface)); }
 .sw.none { background: var(--none); }
 .sw.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); margin: 0 7px 0 3px; }
+.sw.dot.fix { background: var(--orange); }
 
 .fact-history { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; }
 .fact-history h3 { margin: 0 0 8px; }

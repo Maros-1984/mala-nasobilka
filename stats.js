@@ -49,7 +49,8 @@ export function factStats(profile, op, a, b, settings) {
   const recent = attempts.slice(-5);
   const med = median(recent.map((x) => x.ms));
   const errors = recent.filter((x) => !x.correct).length;
-  return { seen: recent.length > 0, median: med, errors, attempts, level: levelOf(med, settings) };
+  const corrected = recent.filter((x) => x.correct && x.firstTry != null).length;
+  return { seen: recent.length > 0, median: med, errors, corrected, attempts, level: levelOf(med, settings) };
 }
 
 export function weightOf(stats, settings) {
@@ -151,7 +152,7 @@ export function renderHeatmap(container, profile, op, settings, onCell) {
       const s = factStats(profile, op, a, b, settings);
       const cell = document.createElement('button');
       cell.type = 'button';
-      cell.className = 'cell' + (s.seen ? ` seen ${s.level}` : '') + (s.errors ? ' err' : '');
+      cell.className = 'cell' + (s.seen ? ` seen ${s.level}` : '') + (s.errors ? ' err' : s.corrected ? ' fix' : '');
       cell.dataset.a = String(a);
       cell.dataset.b = String(b);
       cell.title = `${questionText(op, a, b)} = ${answerOf(op, a, b)}`;
@@ -165,7 +166,7 @@ export function renderHeatmap(container, profile, op, settings, onCell) {
 
 export function renderFactHistory(container, op, a, b, stats) {
   const rows = [...stats.attempts].reverse().map(
-    (x) => `<tr><td>${formatDate(x.roundAt)}</td><td>${formatSeconds(x.ms)}</td><td class="${x.correct ? 'ok' : 'wrong'}">${x.correct ? '✓' : `✗ (${x.given})`}</td></tr>`,
+    (x) => `<tr><td>${formatDate(x.roundAt)}</td><td>${formatSeconds(x.ms)}</td><td class="${x.correct ? 'ok' : 'wrong'}">${x.correct ? (x.firstTry != null ? `✓ (nejdřív ${x.firstTry})` : '✓') : `✗ (${x.given})`}</td></tr>`,
   );
   container.hidden = false;
   container.innerHTML = `<h3>${questionText(op, a, b)} = ${answerOf(op, a, b)}</h3>` +

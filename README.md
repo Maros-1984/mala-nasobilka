@@ -6,7 +6,8 @@ Dítě hraje na tabletu, rodič vidí ve statistikách, které příklady jdou z
 ## Co to umí
 
 - Kolo s nastavitelným počtem příkladů, numerická klávesnice na obrazovce (i fyzická).
-- Měření času každé odpovědi, při chybě se ukáže správný výsledek a příklad se v kole zopakuje.
+- Měření času každé odpovědi. Správná odpověď se potvrdí sama, špatnou je třeba potvrdit tlačítkem OK, pak se ukáže správný výsledek a příklad se v kole zopakuje.
+- Když dítě napíše nejdřív špatně a opraví se, zapíše se to jako správně s poznámkou "nejdřív N" (oranžová tečka v heatmapě).
 - Krátký zvuk při správné i chybné odpovědi (syntetizovaný, bez souborů), globální vypínač v Nastavení.
 - Adaptivní výběr: pomalé a chybové příklady chodí častěji, nehrané mají přednost.
 - Statistiky: heatmapa 10×10 (medián posledních 5 pokusů, tečka = chyba), histogram časů, vývoj po kolech.

@@ -34,11 +34,14 @@ async function readQuestion(page) {
   };
 }
 
+/** Types the digits; a correct answer submits itself, otherwise presses OK. */
 async function typeAnswer(page, value) {
   for (const ch of String(value)) {
     await page.click(`.numpad button[data-key="${ch}"]`);
   }
-  await page.click('.numpad button[data-key="ok"]');
+  const stillOnRound = await page.locator('#screen-round').isVisible();
+  const shown = (await page.locator('#answer-display').textContent()).trim();
+  if (stillOnRound && shown === String(value)) await page.click('.numpad button[data-key="ok"]');
 }
 
 /** Plays until the summary screen shows. `wrongOn` = zero-based indexes to answer wrongly. */
