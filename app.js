@@ -88,7 +88,7 @@ function renderProfiles() {
     const del = document.createElement('button');
     del.className = 'btn delete';
     del.title = 'Zmazať profil';
-    del.textContent = '🗑';
+    del.textContent = '✕';
     del.addEventListener('click', () => {
       const confirm = document.createElement('button');
       confirm.className = 'btn confirm-delete';

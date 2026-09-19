@@ -172,6 +172,13 @@ export function renderFactHistory(container, op, a, b, stats) {
     (rows.length ? `<table><tbody>${rows.join('')}</tbody></table>` : '<p class="muted">Ešte nehrané.</p>');
 }
 
+function niceStep(raw) {
+  const pow = Math.pow(10, Math.floor(Math.log10(Math.max(raw, 1e-9))));
+  const f = raw / pow;
+  const nice = f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10;
+  return Math.max(1, nice * pow);
+}
+
 const SVG_NS = 'http://www.w3.org/2000/svg';
 function svgEl(name, attrs = {}, text) {
   const n = document.createElementNS(SVG_NS, name);
@@ -190,7 +197,9 @@ export function renderHistogram(svg, answers) {
   svg.innerHTML = '';
   const W = 640, H = 320, L = 44, R = 16, T = 40, B = 44;
   const bins = histogramBins(answers);
-  const maxCount = Math.max(1, ...bins.map((x) => x.correct + x.wrong));
+  const rawMax = Math.max(1, ...bins.map((x) => x.correct + x.wrong));
+  const step = niceStep(rawMax / 5);
+  const maxCount = Math.ceil(rawMax / step) * step;
   const plotW = W - L - R, plotH = H - T - B;
   const bw = plotW / bins.length;
   const y = (v) => T + plotH - (v / maxCount) * plotH;
@@ -202,9 +211,7 @@ export function renderHistogram(svg, answers) {
   svg.appendChild(svgEl('text', { x: L + 108, y: 22 }, 'chyba'));
 
   // y grid + labels
-  const steps = Math.min(5, maxCount);
-  for (let i = 0; i <= steps; i++) {
-    const v = Math.round((maxCount * i) / steps);
+  for (let v = 0; v <= maxCount; v += step) {
     svg.appendChild(svgEl('line', { x1: L, x2: W - R, y1: y(v), y2: y(v), class: 'grid' }));
     svg.appendChild(svgEl('text', { x: L - 6, y: y(v) + 4, 'text-anchor': 'end' }, String(v)));
   }
@@ -243,8 +250,9 @@ export function renderTrend(svg, series) {
     return;
   }
   const n = series.length;
-  const plotW = W - L - R;
-  const xOf = (i) => L + (n === 1 ? plotW / 2 : (i / (n - 1)) * plotW);
+  const pad = 24;
+  const plotW = W - L - R - 2 * pad;
+  const xOf = (i) => L + pad + (n === 1 ? plotW / 2 : (i / (n - 1)) * plotW);
 
   // panel 1: median seconds
   const p1 = { top: 28, h: 130 };

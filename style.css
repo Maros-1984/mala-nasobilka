@@ -101,7 +101,7 @@ input[type="text"], input[type="number"], select {
 .profile-list { display: flex; flex-direction: column; gap: 10px; }
 .profile-row { display: flex; gap: 8px; align-items: center; }
 .profile-row .profile { flex: 1; text-align: left; font-size: 1.4rem; padding: 18px 20px; }
-.profile-row .delete, .profile-row .confirm-delete { min-width: 48px; }
+.profile-row .delete, .profile-row .confirm-delete { min-width: 56px; font-size: 1.3rem; color: var(--text-2); }
 .profile-row .confirm-delete { color: var(--danger); border-color: var(--danger); }
 
 .notice {
