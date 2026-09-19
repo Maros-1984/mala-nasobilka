@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 
 test('create a profile, select it, survives reload', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#screen-profiles h1')).toHaveText('Kto hrá?');
+  await expect(page.locator('#screen-profiles h1')).toHaveText('Kdo hraje?');
 
   await page.fill('#new-profile-name', 'Ema');
   await page.click('#btn-add-profile');

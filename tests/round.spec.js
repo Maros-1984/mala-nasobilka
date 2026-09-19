@@ -10,8 +10,8 @@ test('play a 5-question round correctly, see the summary', async ({ page }) => {
   const asked = await playRound(page);
 
   expect(asked).toHaveLength(5);
-  await expect(page.locator('#summary-text')).toContainText('5 odpovedí');
-  await expect(page.locator('#summary-text')).toContainText('0 chýb');
+  await expect(page.locator('#summary-text')).toContainText('5 odpovědí');
+  await expect(page.locator('#summary-text')).toContainText('0 chyb');
   await expect(page.locator('#summary-slowest li')).toHaveCount(3);
 });
 
@@ -26,7 +26,7 @@ test('wrong answer shows the correct one and re-asks the fact', async ({ page })
   expect(asked).toHaveLength(6);
   const repeats = asked.filter((q) => q.op === first.op && q.a === first.a && q.b === first.b);
   expect(repeats).toHaveLength(2);
-  await expect(page.locator('#summary-text')).toContainText('6 odpovedí');
+  await expect(page.locator('#summary-text')).toContainText('6 odpovědí');
   await expect(page.locator('#summary-text')).toContainText('1 chyba');
 });
 
@@ -44,7 +44,7 @@ test('division-only setting asks only division; abort keeps partial round', asyn
   await page.click('#btn-abort');
   await expect(page.locator('#screen-home')).toBeVisible();
   await expect(page.locator('#home-summary')).toContainText('1 kolo');
-  await expect(page.locator('#home-summary')).toContainText('3 odpovede');
+  await expect(page.locator('#home-summary')).toContainText('3 odpovědi');
 });
 
 test('physical keyboard works too', async ({ page }) => {

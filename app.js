@@ -23,13 +23,13 @@ function loadState() {
     const parsed = JSON.parse(raw);
     if (parsed.version > VERSION) {
       storageBroken = true;
-      notice('Dáta sú z novšej verzie hry. Nenačítavam ich, aby som ich neprepísal.');
+      notice('Data jsou z novější verze hry. Nenačítám je, abych je nepřepsal.');
       return { version: VERSION, activeProfileId: null, profiles: [] };
     }
     return parsed;
   } catch {
     storageBroken = true;
-    notice('Dáta sa nedajú načítať ani uložiť. Hra beží len v pamäti.');
+    notice('Data nejde načíst ani uložit. Hra běží jen v paměti.');
     return { version: VERSION, activeProfileId: null, profiles: [] };
   }
 }
@@ -40,7 +40,7 @@ function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch {
     storageBroken = true;
-    notice('Dáta sa nedajú uložiť (úložisko je plné alebo blokované). Hra beží len v pamäti.');
+    notice('Data nejde uložit (úložiště je plné nebo blokované). Hra běží jen v paměti.');
   }
 }
 
@@ -87,12 +87,12 @@ function renderProfiles() {
     btn.addEventListener('click', () => selectProfile(p.id));
     const del = document.createElement('button');
     del.className = 'btn delete';
-    del.title = 'Zmazať profil';
+    del.title = 'Smazat profil';
     del.textContent = '✕';
     del.addEventListener('click', () => {
       const confirm = document.createElement('button');
       confirm.className = 'btn confirm-delete';
-      confirm.textContent = 'Naozaj zmazať?';
+      confirm.textContent = 'Opravdu smazat?';
       confirm.addEventListener('click', () => {
         state.profiles = state.profiles.filter((x) => x.id !== p.id);
         if (state.activeProfileId === p.id) state.activeProfileId = null;
@@ -142,8 +142,8 @@ function goHome() {
   const answers = allAnswers(p);
   const rounds = p.rounds.filter((r) => r.answers.length).length;
   $('#home-summary').textContent = rounds
-    ? `${rounds} ${plural(rounds, 'kolo', 'kolá', 'kôl')}, ${answers.length} ${plural(answers.length, 'odpoveď', 'odpovede', 'odpovedí')}, medián ${formatSeconds(median(answers.map((x) => x.ms)))}`
-    : 'Zatiaľ žiadne kolo.';
+    ? `${rounds} ${plural(rounds, 'kolo', 'kola', 'kol')}, ${answers.length} ${plural(answers.length, 'odpověď', 'odpovědi', 'odpovědí')}, medián ${formatSeconds(median(answers.map((x) => x.ms)))}`
+    : 'Zatím žádné kolo.';
   showScreen('screen-home');
 }
 
@@ -218,11 +218,11 @@ $('#import-file').addEventListener('change', async (e) => {
   try {
     data = JSON.parse(await file.text());
   } catch {
-    notice('Súbor nie je platný JSON.');
+    notice('Soubor není platný JSON.');
     return;
   }
   if (!data || data.version !== VERSION || !Array.isArray(data.profiles)) {
-    notice('Súbor nemá očakávaný formát (verzia 1).');
+    notice('Soubor nemá očekávaný formát (verze 1).');
     return;
   }
   let imported = 0;
@@ -235,7 +235,7 @@ $('#import-file').addEventListener('change', async (e) => {
     imported++;
   }
   saveState();
-  notice(imported ? `Import hotový: ${imported} ${plural(imported, 'profil', 'profily', 'profilov')}.` : 'V súbore nie sú žiadne profily.');
+  notice(imported ? `Import hotov: ${imported} ${plural(imported, 'profil', 'profily', 'profilů')}.` : 'V souboru nejsou žádné profily.');
   goHome();
 });
 
@@ -309,7 +309,7 @@ function submitAnswer() {
     advance();
   } else {
     screen.classList.add('flash-wrong');
-    $('#feedback').textContent = `Správne: ${answerOf(q.op, q.a, q.b)}`;
+    $('#feedback').textContent = `Správně: ${answerOf(q.op, q.a, q.b)}`;
     round.queue.push({ ...q });
     $('#progress').textContent = `${round.index + 1} / ${round.queue.length}`;
     setTimeout(() => {
@@ -336,8 +336,8 @@ function finishRound() {
   const answers = round.answers;
   const errors = answers.filter((x) => !x.correct).length;
   $('#summary-text').textContent =
-    `${answers.length} ${plural(answers.length, 'odpoveď', 'odpovede', 'odpovedí')}, ` +
-    `${errors} ${plural(errors, 'chyba', 'chyby', 'chýb')}, medián ${formatSeconds(median(answers.map((x) => x.ms)))}.`;
+    `${answers.length} ${plural(answers.length, 'odpověď', 'odpovědi', 'odpovědí')}, ` +
+    `${errors} ${plural(errors, 'chyba', 'chyby', 'chyb')}, medián ${formatSeconds(median(answers.map((x) => x.ms)))}.`;
   const slowest = [...answers].sort((x, y) => y.ms - x.ms).slice(0, 3);
   $('#summary-slowest').innerHTML = slowest
     .map((x) => `<li>${questionText(x.op, x.a, x.b)} = ${answerOf(x.op, x.a, x.b)} — ${formatSeconds(x.ms)}${x.correct ? '' : ' (chyba)'}</li>`)
@@ -396,7 +396,7 @@ function renderStats() {
   } else if (stats.tab === 'histogram') {
     const lastRound = [...p.rounds].reverse().find((r) => r.answers.length);
     const answers = stats.filter === 'last' ? (lastRound ? lastRound.answers : []) : allAnswers(p);
-    $('#hist-total').textContent = `${answers.length} ${plural(answers.length, 'odpoveď', 'odpovede', 'odpovedí')}`;
+    $('#hist-total').textContent = `${answers.length} ${plural(answers.length, 'odpověď', 'odpovědi', 'odpovědí')}`;
     renderHistogram($('#histogram'), answers);
   } else {
     renderTrend($('#trend'), roundSeries(p));

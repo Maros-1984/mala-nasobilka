@@ -50,8 +50,8 @@ async function playRound(page, { wrongOn = [] } = {}) {
     const correct = correctAnswer(q.op, q.a, q.b);
     if (wrongOn.includes(i)) {
       await typeAnswer(page, correct + 1);
-      await expect(page.locator('#feedback')).toContainText('Správne:');
-      await expect(page.locator('#feedback')).not.toContainText('Správne:', { timeout: 5000 });
+      await expect(page.locator('#feedback')).toContainText('Správně:');
+      await expect(page.locator('#feedback')).not.toContainText('Správně:', { timeout: 5000 });
     } else {
       await typeAnswer(page, correct);
     }

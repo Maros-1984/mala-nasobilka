@@ -1,30 +1,30 @@
 # Malá násobilka
 
-Tréning malej násobilky (násobenie aj delenie 1–10) s meraním rýchlosti odpovede.
-Dieťa hrá na tablete, rodič vidí v štatistikách, ktoré príklady idú spamäti a ktoré nie.
+Trénink malé násobilky (násobení i dělení 1–10) s měřením rychlosti odpovědi.
+Dítě hraje na tabletu, rodič vidí ve statistikách, které příklady jdou zpaměti a které ne.
 
-## Čo to vie
+## Co to umí
 
-- Kolo s nastaviteľným počtom príkladov, numerická klávesnica na obrazovke (aj fyzická).
-- Meranie času každej odpovede, pri chybe sa ukáže správny výsledok a príklad sa v kole zopakuje.
-- Adaptívny výber: pomalé a chybové príklady chodia častejšie, nehrané majú prednosť.
-- Štatistiky: heatmapa 10×10 (medián posledných 5 pokusov, bodka = chyba), histogram časov, vývoj po kolách.
-- Viac profilov na jednom zariadení, dáta v `localStorage`, export/import JSON.
+- Kolo s nastavitelným počtem příkladů, numerická klávesnice na obrazovce (i fyzická).
+- Měření času každé odpovědi, při chybě se ukáže správný výsledek a příklad se v kole zopakuje.
+- Adaptivní výběr: pomalé a chybové příklady chodí častěji, nehrané mají přednost.
+- Statistiky: heatmapa 10×10 (medián posledních 5 pokusů, tečka = chyba), histogram časů, vývoj po kolech.
+- Více profilů na jednom zařízení, data v `localStorage`, export/import JSON.
 
-## Spustenie
+## Spuštění
 
-Statická stránka, stačí otvoriť `index.html` cez ľubovoľný HTTP server
-(ES moduly nefungujú cez `file://`), napríklad:
+Statická stránka, stačí otevřít `index.html` přes libovolný HTTP server
+(ES moduly nefungují přes `file://`), například:
 
 ```
 node tests/serve.js
 ```
 
-a otvoriť <http://localhost:4173>.
+a otevřít <http://localhost:4173>.
 
 ## Testy
 
-End-to-end cez Playwright:
+End-to-end přes Playwright:
 
 ```
 npm install

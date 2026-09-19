@@ -169,7 +169,7 @@ export function renderFactHistory(container, op, a, b, stats) {
   );
   container.hidden = false;
   container.innerHTML = `<h3>${questionText(op, a, b)} = ${answerOf(op, a, b)}</h3>` +
-    (rows.length ? `<table><tbody>${rows.join('')}</tbody></table>` : '<p class="muted">Ešte nehrané.</p>');
+    (rows.length ? `<table><tbody>${rows.join('')}</tbody></table>` : '<p class="muted">Ještě nehráno.</p>');
 }
 
 function niceStep(raw) {
@@ -206,7 +206,7 @@ export function renderHistogram(svg, answers) {
 
   // legend
   svg.appendChild(svgEl('rect', { x: L, y: 12, width: 12, height: 12, class: 'bar ok legend-sw' }));
-  svg.appendChild(svgEl('text', { x: L + 18, y: 22 }, 'správne'));
+  svg.appendChild(svgEl('text', { x: L + 18, y: 22 }, 'správně'));
   svg.appendChild(svgEl('rect', { x: L + 90, y: 12, width: 12, height: 12, class: 'bar wrong legend-sw' }));
   svg.appendChild(svgEl('text', { x: L + 108, y: 22 }, 'chyba'));
 
@@ -222,22 +222,22 @@ export function renderHistogram(svg, answers) {
     const w = Math.max(1, bw - 2);
     if (bin.correct) {
       svg.appendChild(svgEl('rect', { x, y: y(bin.correct), width: w, height: y(0) - y(bin.correct), class: 'bar ok', rx: 2 }))
-        .appendChild(svgEl('title', {}, `${label(bin)}: ${bin.correct} správne`));
+        .appendChild(svgEl('title', {}, `${label(bin)}: ${bin.correct} správně`));
     }
     if (bin.wrong) {
       const top = y(bin.correct + bin.wrong);
       svg.appendChild(svgEl('rect', { x, y: top, width: w, height: y(bin.correct) - top - (bin.correct ? 1 : 0), class: 'bar wrong', rx: 2 }))
-        .appendChild(svgEl('title', {}, `${label(bin)}: ${bin.wrong} chýb`));
+        .appendChild(svgEl('title', {}, `${label(bin)}: ${bin.wrong} chyb`));
     }
     if (i % 2 === 0) {
       svg.appendChild(svgEl('text', { x: L + i * bw, y: H - B + 16, 'text-anchor': 'middle' }, i === bins.length - 1 ? '10+' : String(bin.from / 1000)));
     }
   });
-  svg.appendChild(svgEl('text', { x: L + plotW / 2, y: H - 8, 'text-anchor': 'middle' }, 'čas odpovede (s)'));
-  if (!answers.length) svg.appendChild(svgEl('text', { x: W / 2, y: H / 2, 'text-anchor': 'middle', class: 'empty' }, 'Zatiaľ žiadne odpovede'));
+  svg.appendChild(svgEl('text', { x: L + plotW / 2, y: H - 8, 'text-anchor': 'middle' }, 'čas odpovědi (s)'));
+  if (!answers.length) svg.appendChild(svgEl('text', { x: W / 2, y: H / 2, 'text-anchor': 'middle', class: 'empty' }, 'Zatím žádné odpovědi'));
 
   function label(bin) {
-    return bin.to === Infinity ? `${bin.from / 1000} s a viac` : `${bin.from / 1000}–${bin.to / 1000} s`;
+    return bin.to === Infinity ? `${bin.from / 1000} s a více` : `${bin.from / 1000}–${bin.to / 1000} s`;
   }
 }
 
@@ -246,7 +246,7 @@ export function renderTrend(svg, series) {
   svg.innerHTML = '';
   const W = 640, H = 320, L = 44, R = 16;
   if (!series.length) {
-    svg.appendChild(svgEl('text', { x: W / 2, y: H / 2, 'text-anchor': 'middle', class: 'empty' }, 'Zatiaľ žiadne kolá'));
+    svg.appendChild(svgEl('text', { x: W / 2, y: H / 2, 'text-anchor': 'middle', class: 'empty' }, 'Zatím žádná kola'));
     return;
   }
   const n = series.length;
@@ -268,7 +268,7 @@ export function renderTrend(svg, series) {
   svg.appendChild(svgEl('path', { d, class: 'line' }));
   series.forEach((s, i) => {
     const c = svgEl('circle', { cx: xOf(i), cy: y1(s.medianMs), r: 5, class: 'point' });
-    c.appendChild(svgEl('title', {}, `${formatDate(s.date)} · ${s.n} odpovedí · medián ${formatSeconds(s.medianMs)}`));
+    c.appendChild(svgEl('title', {}, `${formatDate(s.date)} · ${s.n} odpovědí · medián ${formatSeconds(s.medianMs)}`));
     svg.appendChild(c);
   });
 
@@ -276,7 +276,7 @@ export function renderTrend(svg, series) {
   const p2 = { top: 196, h: 90 };
   const maxErr = Math.max(0.1, ...series.map((s) => s.errorRate));
   const y2 = (rate) => p2.top + p2.h - (rate / maxErr) * p2.h;
-  svg.appendChild(svgEl('text', { x: L, y: p2.top - 10, class: 'title' }, 'Chybovosť (%)'));
+  svg.appendChild(svgEl('text', { x: L, y: p2.top - 10, class: 'title' }, 'Chybovost (%)'));
   for (let i = 0; i <= 2; i++) {
     const v = (maxErr * i) / 2;
     svg.appendChild(svgEl('line', { x1: L, x2: W - R, y1: y2(v), y2: y2(v), class: 'grid' }));
@@ -286,7 +286,7 @@ export function renderTrend(svg, series) {
   series.forEach((s, i) => {
     const h = y2(0) - y2(s.errorRate);
     const r = svgEl('rect', { x: xOf(i) - bw / 2, y: y2(s.errorRate), width: bw, height: Math.max(0, h), class: 'bar err', rx: 2 });
-    r.appendChild(svgEl('title', {}, `${formatDate(s.date)} · ${Math.round(s.errorRate * 100)} % chýb`));
+    r.appendChild(svgEl('title', {}, `${formatDate(s.date)} · ${Math.round(s.errorRate * 100)} % chyb`));
     svg.appendChild(r);
   });
   svg.appendChild(svgEl('line', { x1: L, x2: W - R, y1: y2(0), y2: y2(0), class: 'axis' }));

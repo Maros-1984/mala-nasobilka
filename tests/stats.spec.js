@@ -43,11 +43,11 @@ test('histogram and trend render after two rounds', async ({ page }) => {
   await page.click('#btn-summary-stats');
 
   await page.click('#stats-tabs .tab[data-tab="histogram"]');
-  await expect(page.locator('#hist-total')).toHaveText('6 odpovedí');
+  await expect(page.locator('#hist-total')).toHaveText('6 odpovědí');
   expect(await page.locator('#histogram rect.bar.ok').count()).toBeGreaterThan(0);
   expect(await page.locator('#histogram rect.bar.wrong').count()).toBeGreaterThan(0);
   await page.click('#hist-filter button[data-filter="all"]');
-  await expect(page.locator('#hist-total')).toHaveText('11 odpovedí');
+  await expect(page.locator('#hist-total')).toHaveText('11 odpovědí');
 
   await page.click('#stats-tabs .tab[data-tab="trend"]');
   await expect(page.locator('#trend circle.point')).toHaveCount(2);
@@ -82,7 +82,7 @@ test('export then import into a clean browser restores the profile', async ({ pa
   await createProfile(page, 'Dočasný');
   await page.click('#btn-settings');
   await page.setInputFiles('#import-file', file);
-  await expect(page.locator('#notice')).toContainText('Import hotový');
+  await expect(page.locator('#notice')).toContainText('Import hotov');
 
   await page.click('#btn-switch-profile');
   await page.click('#profile-list button.profile:has-text("Ema")');
@@ -94,6 +94,6 @@ test('invalid import file shows a notice and changes nothing', async ({ page }) 
   await createProfile(page, 'Ema');
   await page.click('#btn-settings');
   await page.setInputFiles('#import-file', { name: 'x.json', mimeType: 'application/json', buffer: Buffer.from('{not json') });
-  await expect(page.locator('#notice')).toContainText('nie je platný JSON');
+  await expect(page.locator('#notice')).toContainText('není platný JSON');
   await expect(page.locator('#screen-settings')).toBeVisible();
 });

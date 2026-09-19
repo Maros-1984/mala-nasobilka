@@ -1,7 +1,7 @@
 {
   "name": "mala-nasobilka",
   "version": "1.0.0",
-  "description": "Tréning malej násobilky s meraním rýchlosti",
+  "description": "Trénink malé násobilky s měřením rychlosti",
   "directories": {
     "doc": "docs",
     "test": "tests"
