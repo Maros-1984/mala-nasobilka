@@ -7,6 +7,7 @@ Dítě hraje na tabletu, rodič vidí ve statistikách, které příklady jdou z
 
 - Kolo s nastavitelným počtem příkladů, numerická klávesnice na obrazovce (i fyzická).
 - Měření času každé odpovědi, při chybě se ukáže správný výsledek a příklad se v kole zopakuje.
+- Krátký zvuk při správné i chybné odpovědi (syntetizovaný, bez souborů), globální vypínač v Nastavení.
 - Adaptivní výběr: pomalé a chybové příklady chodí častěji, nehrané mají přednost.
 - Statistiky: heatmapa 10×10 (medián posledních 5 pokusů, tečka = chyba), histogram časů, vývoj po kolech.
 - Více profilů na jednom zařízení, data v `localStorage`, export/import JSON.

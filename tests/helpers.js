@@ -9,12 +9,13 @@ async function createProfile(page, name = 'Ema') {
   await expect(page.locator('#screen-home h1')).toHaveText(name);
 }
 
-async function setSettings(page, { count, ops, green, orange } = {}) {
+async function setSettings(page, { count, ops, green, orange, sound } = {}) {
   await page.click('#btn-settings');
   if (count !== undefined) await page.fill('#set-count', String(count));
   if (ops !== undefined) await page.selectOption('#set-ops', ops);
   if (green !== undefined) await page.fill('#set-green', String(green));
   if (orange !== undefined) await page.fill('#set-orange', String(orange));
+  if (sound !== undefined) await page.setChecked('#set-sound', sound);
   await page.click('#btn-save-settings');
   await expect(page.locator('#screen-home')).toBeVisible();
 }

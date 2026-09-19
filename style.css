@@ -96,6 +96,8 @@ input[type="text"], input[type="number"], select {
 }
 .form { display: flex; flex-direction: column; gap: 14px; }
 .form label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
+.form label.check { flex-direction: row; align-items: center; gap: 10px; }
+.form label.check input { width: 22px; height: 22px; }
 #form-add-profile input { flex: 1; }
 
 .profile-list { display: flex; flex-direction: column; gap: 10px; }

@@ -2,6 +2,7 @@ import {
   answerOf, questionText, pickRound, median, allAnswers, factStats, roundSeries,
   renderHeatmap, renderFactHistory, renderHistogram, renderTrend, formatSeconds,
 } from './stats.js';
+import { unlockAudio, playCorrect, playWrong } from './sound.js';
 
 const STORAGE_KEY = 'nasobilka.v1';
 const VERSION = 1;
@@ -165,6 +166,7 @@ function openSettings() {
   $('#set-ops').value = s.ops;
   $('#set-green').value = s.greenMs / 1000;
   $('#set-orange').value = s.orangeMs / 1000;
+  $('#set-sound').checked = soundOn();
   $('#btn-wipe-confirm').hidden = true;
   $('#btn-wipe').hidden = false;
   showScreen('screen-settings');
@@ -177,6 +179,7 @@ $('#form-settings').addEventListener('submit', (e) => {
   const green = Math.max(500, Math.round(Number($('#set-green').value) * 1000) || 3000);
   const orange = Math.max(green + 500, Math.round(Number($('#set-orange').value) * 1000) || 5000);
   p.settings = { questionsPerRound: count, ops: $('#set-ops').value, greenMs: green, orangeMs: orange };
+  state.sound = $('#set-sound').checked;
   saveState();
   goHome();
 });
@@ -281,6 +284,7 @@ function renderTyped() {
 
 function pressKey(key) {
   if (!round || round.locked) return;
+  if (soundOn()) unlockAudio();
   if (key === 'back') {
     round.typed = round.typed.slice(0, -1);
     renderTyped();
@@ -294,6 +298,11 @@ function pressKey(key) {
   }
 }
 
+/** Global (per device) sound switch; missing key means on. */
+function soundOn() {
+  return state.sound !== false;
+}
+
 function submitAnswer() {
   if (!round.typed) return;
   const ms = Math.round(performance.now() - round.shownAt);
@@ -304,10 +313,12 @@ function submitAnswer() {
   round.locked = true;
   const screen = $('#screen-round');
   if (correct) {
+    if (soundOn()) playCorrect();
     screen.classList.add('flash-ok');
     setTimeout(() => screen.classList.remove('flash-ok'), FLASH_MS);
     advance();
   } else {
+    if (soundOn()) playWrong();
     screen.classList.add('flash-wrong');
     $('#feedback').textContent = `Správně: ${answerOf(q.op, q.a, q.b)}`;
     round.queue.push({ ...q });
