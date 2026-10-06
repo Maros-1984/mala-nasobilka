@@ -5,14 +5,14 @@ Dítě hraje na tabletu, rodič vidí ve statistikách, které příklady jdou z
 
 ## Aplikace
 
-Jeden společný kód, čtyři adresy (každá má vlastní profily a data v `localStorage`):
+Jeden společný kód, čtyři adresy na GitHub Pages (každá má vlastní profily a data v `localStorage`):
 
 | Adresa | Co trénuje | Prahy zelená/oranžová | Kolo |
 | --- | --- | --- | --- |
-| `/` | malá násobilka a dělení 1–10 | 3 s / 5 s | 30 |
-| `/velka/` | 2–9 × 11–99 (bez násobků 10), např. 7 × 45 | 6 s / 12 s | 20 |
-| `/polovice/` | polovina sudých čísel do 200 a desítek do 1000 | 2 s / 4 s | 30 |
-| `/deleni/` | obrácená velká násobilka, např. 315 : 7 | 10 s / 20 s | 15 |
+| [`/`](https://maros-1984.github.io/mala-nasobilka/) | malá násobilka a dělení 1–10 | 3 s / 5 s | 30 |
+| [`/velka/`](https://maros-1984.github.io/mala-nasobilka/velka/) | 2–9 × 11–99 (bez násobků 10), např. 7 × 45 | 6 s / 12 s | 20 |
+| [`/polovice/`](https://maros-1984.github.io/mala-nasobilka/polovice/) | polovina sudých čísel do 200 a desítek do 1000 | 2 s / 4 s | 30 |
+| [`/deleni/`](https://maros-1984.github.io/mala-nasobilka/deleni/) | obrácená velká násobilka, např. 315 : 7 | 10 s / 20 s | 15 |
 
 Po chybě ukáže velká násobilka a dělení rozklad (`7 × 40 + 7 × 5 = 280 + 35 = 315`),
 poloviny jen výsledek, a čeká na tlačítko Dál. Adaptivní výběr u velké násobilky
