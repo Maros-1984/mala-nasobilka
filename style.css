@@ -106,6 +106,10 @@ input[type="text"], input[type="number"], select {
 .profile-row .delete, .profile-row .confirm-delete { min-width: 56px; font-size: 1.3rem; color: var(--text-2); }
 .profile-row .confirm-delete { color: var(--danger); border-color: var(--danger); }
 
+.app-title { margin: 0; color: var(--primary); font-weight: 600; letter-spacing: 0.02em; }
+.apps { display: flex; gap: 8px 18px; flex-wrap: wrap; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); }
+.app-link { color: var(--primary); font-size: 1.05rem; padding: 8px 0; }
+
 .notice {
   position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
   background: var(--danger); color: #fff; padding: 10px 16px; border-radius: 10px;
@@ -133,6 +137,7 @@ input[type="text"], input[type="number"], select {
   margin: 0 auto;
   width: 60%;
 }
+.question-polovice { font-size: clamp(2.2rem, 8vw, 4rem); }
 .feedback {
   text-align: center;
   font-size: 1.6rem;
@@ -183,12 +188,13 @@ input[type="text"], input[type="number"], select {
 }
 .segment button.active { background: var(--primary); color: var(--primary-ink); }
 
-.heatmap {
+.heatmap { display: flex; flex-direction: column; gap: 12px; }
+.heatmap-grid {
   display: grid;
-  grid-template-columns: auto repeat(10, 1fr);
   gap: 3px;
   font-variant-numeric: tabular-nums;
 }
+.grid-caption { margin: 4px 0 0; font-size: 1rem; color: var(--text-2); }
 .heatmap .hdr {
   display: flex; align-items: center; justify-content: center;
   font-size: 0.85rem; color: var(--text-2); font-weight: 600; min-height: 24px; padding: 0 4px;
@@ -218,6 +224,7 @@ input[type="text"], input[type="number"], select {
   content: ""; position: absolute; top: 3px; right: 3px; width: 7px; height: 7px;
   border-radius: 50%; background: var(--orange); border: 1px solid var(--surface);
 }
+.cell.blank { background: transparent; cursor: default; }
 .cell.selected { outline: 3px solid var(--primary); outline-offset: -1px; }
 .legend { display: flex; gap: 6px 14px; align-items: center; flex-wrap: wrap; font-size: 0.9rem; color: var(--text-2); margin: 0; }
 .sw { display: inline-block; width: 14px; height: 14px; border-radius: 4px; margin-right: 4px; vertical-align: -2px; }

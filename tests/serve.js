@@ -17,7 +17,7 @@ const mime = {
 http
   .createServer((req, res) => {
     const urlPath = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-    let file = path.join(root, urlPath === '/' ? 'index.html' : urlPath);
+    let file = path.join(root, urlPath.endsWith('/') ? `${urlPath}index.html` : urlPath);
     if (!file.startsWith(root)) {
       res.writeHead(403).end();
       return;

@@ -1,10 +1,15 @@
 import {
-  answerOf, questionText, pickRound, median, allAnswers, factStats, roundSeries,
-  renderHeatmap, renderFactHistory, renderHistogram, renderTrend, formatSeconds,
+  answerOf, questionText, pickRound, median, allAnswers, attemptsByFact, roundSeries, histogramMaxMs,
+  renderHeatmap, renderFactHistory, renderGroupDetail, renderHistogram, renderTrend, formatSeconds,
 } from './stats.js';
 import { unlockAudio, playCorrect, playWrong } from './sound.js';
+import { MODES } from './modes.js';
+import { shellHtml } from './shell.js';
 
-const STORAGE_KEY = 'nasobilka.v1';
+const MODE = MODES[document.body.dataset.mode] || MODES.mala;
+document.body.insertAdjacentHTML('afterbegin', shellHtml(MODE));
+
+const STORAGE_KEY = MODE.storageKey;
 const VERSION = 1;
 const WRONG_DELAY_MS = 1500;
 const FLASH_MS = 250;
@@ -12,7 +17,7 @@ const FLASH_MS = 250;
 // ---------- storage ----------
 
 export function defaultSettings() {
-  return { questionsPerRound: 30, ops: 'both', greenMs: 3000, orangeMs: 5000 };
+  return { ...MODE.defaults };
 }
 
 let storageBroken = false;
@@ -163,7 +168,7 @@ $('#btn-settings').addEventListener('click', openSettings);
 function openSettings() {
   const s = activeProfile().settings;
   $('#set-count').value = s.questionsPerRound;
-  $('#set-ops').value = s.ops;
+  if (MODE.opChoice) $('#set-ops').value = s.ops;
   $('#set-green').value = s.greenMs / 1000;
   $('#set-orange').value = s.orangeMs / 1000;
   $('#set-sound').checked = soundOn();
@@ -175,10 +180,12 @@ function openSettings() {
 $('#form-settings').addEventListener('submit', (e) => {
   e.preventDefault();
   const p = activeProfile();
-  const count = Math.max(5, Math.min(200, Math.round(Number($('#set-count').value) || 30)));
-  const green = Math.max(500, Math.round(Number($('#set-green').value) * 1000) || 3000);
-  const orange = Math.max(green + 500, Math.round(Number($('#set-orange').value) * 1000) || 5000);
-  p.settings = { questionsPerRound: count, ops: $('#set-ops').value, greenMs: green, orangeMs: orange };
+  const d = MODE.defaults;
+  const count = Math.max(5, Math.min(200, Math.round(Number($('#set-count').value) || d.questionsPerRound)));
+  const green = Math.max(500, Math.round(Number($('#set-green').value) * 1000) || d.greenMs);
+  const orange = Math.max(green + 500, Math.round(Number($('#set-orange').value) * 1000) || d.orangeMs);
+  const ops = MODE.opChoice ? $('#set-ops').value : d.ops;
+  p.settings = { questionsPerRound: count, ops, greenMs: green, orangeMs: orange };
   state.sound = $('#set-sound').checked;
   saveState();
   goHome();
@@ -201,12 +208,12 @@ $('#btn-wipe-confirm').addEventListener('click', () => {
 
 $('#btn-export').addEventListener('click', () => {
   const p = activeProfile();
-  const payload = { version: VERSION, exportedAt: Date.now(), profiles: [p] };
+  const payload = { version: VERSION, mode: MODE.id, exportedAt: Date.now(), profiles: [p] };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   const date = new Date().toISOString().slice(0, 10);
-  a.download = `nasobilka-${p.name.replace(/[^\w\-]+/g, '_')}-${date}.json`;
+  a.download = `${MODE.exportPrefix}-${p.name.replace(/[^\w\-]+/g, '_')}-${date}.json`;
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -228,6 +235,11 @@ $('#import-file').addEventListener('change', async (e) => {
     notice('Soubor nemá očekávaný formát (verze 1).');
     return;
   }
+  // exports from before the other apps existed carry no mode: they are the small table
+  if ((data.mode || 'mala') !== MODE.id) {
+    notice(`Soubor je z jiné aplikace (${MODES[data.mode]?.title || data.mode}), sem ho nenahraju.`);
+    return;
+  }
   let imported = 0;
   for (const prof of data.profiles) {
     if (!prof || typeof prof.id !== 'string' || typeof prof.name !== 'string' || !Array.isArray(prof.rounds)) continue;
@@ -244,18 +256,19 @@ $('#import-file').addEventListener('change', async (e) => {
 
 // ---------- round ----------
 
-let round = null; // { queue, index, answers, shownAt, typed, firstTry, locked, startedAt }
+let round = null; // { queue, index, answers, shownAt, typed, firstTry, locked, waitNext, startedAt }
 
 function startRound() {
   const p = activeProfile();
   round = {
-    queue: pickRound(p, p.settings),
+    queue: pickRound(p, p.settings, MODE),
     index: 0,
     answers: [],
     shownAt: 0,
     typed: '',
     firstTry: null,
     locked: false,
+    waitNext: false,
     startedAt: Date.now(),
   };
   showScreen('screen-round');
@@ -274,6 +287,7 @@ function showQuestion() {
   renderTyped();
   $('.numpad .ok').classList.remove('hint');
   $('#feedback').textContent = '';
+  $('#btn-next').hidden = true;
   $('#progress').textContent = `${round.index + 1} / ${round.queue.length}`;
   round.locked = false;
   requestAnimationFrame(() => {
@@ -286,6 +300,7 @@ function renderTyped() {
 }
 
 function pressKey(key) {
+  if (round && round.waitNext && key === 'ok') return continueAfterWrong();
   if (!round || round.locked) return;
   if (soundOn()) unlockAudio();
   if (key === 'back') {
@@ -333,15 +348,29 @@ function submitAnswer() {
   } else {
     if (soundOn()) playWrong();
     screen.classList.add('flash-wrong');
-    $('#feedback').textContent = `Správně: ${answerOf(q.op, q.a, q.b)}`;
     round.queue.push({ ...q });
     $('#progress').textContent = `${round.index + 1} / ${round.queue.length}`;
+    if (MODE.hint) {
+      // the hint takes a while to read: wait for the child instead of a timer
+      $('#feedback').textContent = MODE.hint(q);
+      $('#btn-next').hidden = false;
+      round.waitNext = true;
+      return;
+    }
+    $('#feedback').textContent = `Správně: ${answerOf(q.op, q.a, q.b)}`;
     setTimeout(() => {
       screen.classList.remove('flash-wrong');
       advance();
     }, WRONG_DELAY_MS);
   }
 }
+
+function continueAfterWrong() {
+  round.waitNext = false;
+  $('#screen-round').classList.remove('flash-wrong');
+  advance();
+}
+$('#btn-next').addEventListener('click', () => round && round.waitNext && continueAfterWrong());
 
 function advance() {
   round.index++;
@@ -396,7 +425,7 @@ $('#btn-summary-home').addEventListener('click', goHome);
 
 // ---------- stats ----------
 
-const stats = { tab: 'heatmap', op: 'mul', filter: 'last' };
+const stats = { tab: 'heatmap', op: MODE.heatmapOps[0], filter: 'last' };
 
 function openStats() {
   showScreen('screen-stats');
@@ -412,16 +441,22 @@ function renderStats() {
   $$('#hist-filter button').forEach((b) => b.classList.toggle('active', b.dataset.filter === stats.filter));
 
   if (stats.tab === 'heatmap') {
-    renderHeatmap($('#heatmap'), p, stats.op, p.settings, (a, b, s, cell) => {
+    const index = attemptsByFact(p);
+    renderHeatmap($('#heatmap'), MODE.grids(stats.op), index, p.settings, (spec, s, cell) => {
       $$('#heatmap .cell.selected').forEach((c) => c.classList.remove('selected'));
       cell.classList.add('selected');
-      renderFactHistory($('#fact-history'), stats.op, a, b, s);
+      if (spec.facts.length === 1) {
+        const f = spec.facts[0];
+        renderFactHistory($('#fact-history'), f.op, f.a, f.b, s);
+      } else {
+        renderGroupDetail($('#fact-history'), spec, index, p.settings);
+      }
     });
   } else if (stats.tab === 'histogram') {
     const lastRound = [...p.rounds].reverse().find((r) => r.answers.length);
     const answers = stats.filter === 'last' ? (lastRound ? lastRound.answers : []) : allAnswers(p);
     $('#hist-total').textContent = `${answers.length} ${plural(answers.length, 'odpověď', 'odpovědi', 'odpovědí')}`;
-    renderHistogram($('#histogram'), answers);
+    renderHistogram($('#histogram'), answers, histogramMaxMs(p.settings));
   } else {
     renderTrend($('#trend'), roundSeries(p));
   }
@@ -433,7 +468,7 @@ $('#stats-tabs').addEventListener('click', (e) => {
   stats.tab = t.dataset.tab;
   renderStats();
 });
-$('#heatmap-op').addEventListener('click', (e) => {
+$('#heatmap-op')?.addEventListener('click', (e) => {
   const b = e.target.closest('button[data-op]');
   if (!b) return;
   stats.op = b.dataset.op;

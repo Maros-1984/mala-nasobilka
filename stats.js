@@ -1,21 +1,22 @@
 // Facts, adaptive picking, derived statistics and SVG charts.
 // Pure functions except the render* helpers, which write into a given DOM node.
 
-export const OPS = ['mul', 'div'];
-
-export const FACTS = [];
-for (const op of OPS) for (let a = 1; a <= 10; a++) for (let b = 1; b <= 10; b++) FACTS.push({ op, a, b });
-
 export function factKey(op, a, b) {
   return `${op}:${a}x${b}`;
 }
 
+// Ops: mul/div = small table (1..10), mul2/div2 = 2..9 × 11..99, half = a / 2 (b is always 2).
+// For div and div2 the shown example is (a·b) : a and the answer is b.
 export function answerOf(op, a, b) {
-  return op === 'mul' ? a * b : b;
+  if (op === 'mul' || op === 'mul2') return a * b;
+  if (op === 'half') return a / 2;
+  return b;
 }
 
 export function questionText(op, a, b) {
-  return op === 'mul' ? `${a} × ${b}` : `${a * b} : ${a}`;
+  if (op === 'mul' || op === 'mul2') return `${a} × ${b}`;
+  if (op === 'half') return `Polovina z ${a}`;
+  return `${a * b} : ${a}`;
 }
 
 export function median(nums) {
@@ -32,9 +33,21 @@ export function allAnswers(profile) {
   return out;
 }
 
-export function recentAttempts(profile, op, a, b, n = 5) {
-  const all = allAnswers(profile).filter((x) => x.op === op && x.a === a && x.b === b);
-  return all.slice(-n);
+/** Attempts per fact (chronological), keyed by factKey. Build once per render or round. */
+export function attemptsByFact(profile) {
+  const index = new Map();
+  allAnswers(profile).forEach((x, seq) => {
+    const k = factKey(x.op, x.a, x.b);
+    if (!index.has(k)) index.set(k, []);
+    index.get(k).push({ ...x, seq });
+  });
+  return index;
+}
+
+/** Attempts of several facts merged in chronological order. */
+export function groupAttempts(facts, index) {
+  if (facts.length === 1) return index.get(factKey(facts[0].op, facts[0].a, facts[0].b)) || [];
+  return facts.flatMap((f) => index.get(factKey(f.op, f.a, f.b)) || []).sort((x, y) => x.seq - y.seq);
 }
 
 export function levelOf(medianMs, settings) {
@@ -44,8 +57,8 @@ export function levelOf(medianMs, settings) {
   return 'red';
 }
 
-export function factStats(profile, op, a, b, settings) {
-  const attempts = allAnswers(profile).filter((x) => x.op === op && x.a === a && x.b === b);
+/** Stats over the last 5 attempts (of one fact, or of a group of facts). */
+export function statsOf(attempts, settings) {
   const recent = attempts.slice(-5);
   const med = median(recent.map((x) => x.ms));
   const errors = recent.filter((x) => !x.correct).length;
@@ -59,29 +72,37 @@ export function weightOf(stats, settings) {
   return 1 + over + 2 * stats.errors;
 }
 
-function opsFor(settings) {
-  return settings.ops === 'both' ? OPS : [settings.ops];
-}
-
-/** Weighted sampling without replacement; refills the pool when exhausted. */
-export function pickRound(profile, settings, rng = Math.random) {
-  const ops = opsFor(settings);
-  const pool = FACTS.filter((f) => ops.includes(f.op)).map((f) => ({
-    ...f,
-    w: weightOf(factStats(profile, f.op, f.a, f.b, settings), settings),
-  }));
+/**
+ * Weighted sampling of the mode's groups without replacement (refilled when exhausted),
+ * then a random fact of the picked group, preferring facts not yet in this round.
+ * In the small table every fact is its own group.
+ */
+export function pickRound(profile, settings, mode, rng = Math.random) {
+  const index = attemptsByFact(profile);
+  const groups = new Map();
+  for (const f of mode.facts(settings)) {
+    const g = mode.groupOf(f);
+    if (!groups.has(g)) groups.set(g, []);
+    groups.get(g).push(f);
+  }
+  const pool = [...groups.values()].map((facts) => ({ facts, w: weightOf(statsOf(groupAttempts(facts, index), settings), settings) }));
   const picked = [];
+  const used = new Set();
   let remaining = [...pool];
   while (picked.length < settings.questionsPerRound) {
     if (!remaining.length) remaining = [...pool];
-    const total = remaining.reduce((s, f) => s + f.w, 0);
+    const total = remaining.reduce((s, g) => s + g.w, 0);
     let r = rng() * total;
     let idx = 0;
     for (; idx < remaining.length - 1; idx++) {
       r -= remaining[idx].w;
       if (r <= 0) break;
     }
-    const [f] = remaining.splice(idx, 1);
+    const [g] = remaining.splice(idx, 1);
+    const fresh = g.facts.filter((f) => !used.has(factKey(f.op, f.a, f.b)));
+    const from = fresh.length ? fresh : g.facts;
+    const f = from[Math.floor(rng() * from.length)];
+    used.add(factKey(f.op, f.a, f.b));
     picked.push({ op: f.op, a: f.a, b: f.b });
   }
   return separateNeighbours(picked);
@@ -102,15 +123,18 @@ function separateNeighbours(list) {
 
 // ---------- Derived data for charts ----------
 
-export const HIST_BIN_MS = 500;
-export const HIST_MAX_MS = 10000;
+/** Histogram range: 10 s for the small table, otherwise ~2× the orange threshold in whole 10 s. */
+export function histogramMaxMs(settings) {
+  return Math.max(10000, Math.ceil((2 * settings.orangeMs) / 10000) * 10000);
+}
 
-/** 21 bins: [0,0.5), [0.5,1) ... [9.5,10), [10,∞). */
-export function histogramBins(answers) {
-  const n = HIST_MAX_MS / HIST_BIN_MS + 1;
-  const bins = Array.from({ length: n }, (_, i) => ({ from: i * HIST_BIN_MS, to: i < n - 1 ? (i + 1) * HIST_BIN_MS : Infinity, correct: 0, wrong: 0 }));
+/** 21 bins: 20 equal ones up to maxMs, then [maxMs,∞). */
+export function histogramBins(answers, maxMs = 10000) {
+  const binMs = maxMs / 20;
+  const n = 21;
+  const bins = Array.from({ length: n }, (_, i) => ({ from: i * binMs, to: i < n - 1 ? (i + 1) * binMs : Infinity, correct: 0, wrong: 0 }));
   for (const ans of answers) {
-    const i = Math.min(n - 1, Math.floor(ans.ms / HIST_BIN_MS));
+    const i = Math.min(n - 1, Math.floor(ans.ms / binMs));
     if (ans.correct) bins[i].correct++;
     else bins[i].wrong++;
   }
@@ -140,28 +164,60 @@ export function formatDate(ts) {
 
 // ---------- Renderers ----------
 
-export function renderHeatmap(container, profile, op, settings, onCell) {
+/**
+ * Renders the mode's grids. A cell holds one fact or a group of facts; its colour is the
+ * median of the group's last 5 attempts. onCell(cell, facts, stats, element).
+ */
+export function renderHeatmap(container, grids, index, settings, onCell) {
   container.innerHTML = '';
-  const frag = document.createDocumentFragment();
-  const corner = el('div', 'hdr corner', op === 'mul' ? '×' : ':');
-  frag.appendChild(corner);
-  for (let b = 1; b <= 10; b++) frag.appendChild(el('div', 'hdr', String(b)));
-  for (let a = 1; a <= 10; a++) {
-    frag.appendChild(el('div', 'hdr', String(a)));
-    for (let b = 1; b <= 10; b++) {
-      const s = factStats(profile, op, a, b, settings);
-      const cell = document.createElement('button');
-      cell.type = 'button';
-      cell.className = 'cell' + (s.seen ? ` seen ${s.level}` : '') + (s.errors ? ' err' : s.corrected ? ' fix' : '');
-      cell.dataset.a = String(a);
-      cell.dataset.b = String(b);
-      cell.title = `${questionText(op, a, b)} = ${answerOf(op, a, b)}`;
-      cell.textContent = s.seen ? (s.median / 1000).toFixed(1).replace('.', ',') : '';
-      cell.addEventListener('click', () => onCell(a, b, s, cell));
-      frag.appendChild(cell);
+  for (const grid of grids) {
+    if (grid.caption) container.appendChild(el('h3', 'grid-caption', grid.caption));
+    const g = el('div', 'heatmap-grid');
+    g.style.gridTemplateColumns = `auto repeat(${grid.cols.length}, 1fr)`;
+    g.style.maxWidth = `${(grid.cols.length + 1) * 64}px`;
+    g.appendChild(el('div', 'hdr corner', grid.corner));
+    for (const c of grid.cols) g.appendChild(el('div', 'hdr', c));
+    for (const row of grid.rows) {
+      g.appendChild(el('div', 'hdr', row.label));
+      for (const spec of row.cells) {
+        if (!spec) {
+          g.appendChild(el('div', 'cell blank'));
+          continue;
+        }
+        const s = statsOf(groupAttempts(spec.facts, index), settings);
+        const cell = document.createElement('button');
+        cell.type = 'button';
+        cell.className = 'cell' + (s.seen ? ` seen ${s.level}` : '') + (s.errors ? ' err' : s.corrected ? ' fix' : '');
+        if (spec.facts.length === 1) {
+          const f = spec.facts[0];
+          cell.dataset.a = String(f.a);
+          cell.dataset.b = String(f.b);
+          cell.title = spec.title || `${questionText(f.op, f.a, f.b)} = ${answerOf(f.op, f.a, f.b)}`;
+        } else {
+          cell.dataset.group = spec.group;
+          cell.title = spec.title;
+        }
+        cell.textContent = s.seen ? (s.median / 1000).toFixed(1).replace('.', ',') : '';
+        cell.addEventListener('click', () => onCell(spec, s, cell));
+        g.appendChild(cell);
+      }
     }
+    container.appendChild(g);
   }
-  container.appendChild(frag);
+}
+
+/** Detail of a grouped cell: every fact with its median and attempt counts. */
+export function renderGroupDetail(container, spec, index, settings) {
+  const rows = spec.facts.map((f) => {
+    const s = statsOf(groupAttempts([f], index), settings);
+    const wrong = s.attempts.filter((x) => !x.correct).length;
+    return `<tr><td>${questionText(f.op, f.a, f.b)} = ${answerOf(f.op, f.a, f.b)}</td>` +
+      `<td>${s.seen ? formatSeconds(s.median) : '–'}</td>` +
+      `<td>${s.attempts.length}×</td>` +
+      `<td class="${wrong ? 'wrong' : ''}">${wrong ? `${wrong} ✗` : ''}</td></tr>`;
+  });
+  container.hidden = false;
+  container.innerHTML = `<h3>${spec.title}</h3><table><tbody>${rows.join('')}</tbody></table>`;
 }
 
 export function renderFactHistory(container, op, a, b, stats) {
@@ -194,10 +250,10 @@ function el(tag, cls, text) {
   return n;
 }
 
-export function renderHistogram(svg, answers) {
+export function renderHistogram(svg, answers, maxMs = 10000) {
   svg.innerHTML = '';
   const W = 640, H = 320, L = 44, R = 16, T = 40, B = 44;
-  const bins = histogramBins(answers);
+  const bins = histogramBins(answers, maxMs);
   const rawMax = Math.max(1, ...bins.map((x) => x.correct + x.wrong));
   const step = niceStep(rawMax / 5);
   const maxCount = Math.ceil(rawMax / step) * step;
@@ -231,14 +287,15 @@ export function renderHistogram(svg, answers) {
         .appendChild(svgEl('title', {}, `${label(bin)}: ${bin.wrong} chyb`));
     }
     if (i % 2 === 0) {
-      svg.appendChild(svgEl('text', { x: L + i * bw, y: H - B + 16, 'text-anchor': 'middle' }, i === bins.length - 1 ? '10+' : String(bin.from / 1000)));
+      svg.appendChild(svgEl('text', { x: L + i * bw, y: H - B + 16, 'text-anchor': 'middle' }, i === bins.length - 1 ? `${maxMs / 1000}+` : String(bin.from / 1000).replace('.', ',')));
     }
   });
   svg.appendChild(svgEl('text', { x: L + plotW / 2, y: H - 8, 'text-anchor': 'middle' }, 'čas odpovědi (s)'));
   if (!answers.length) svg.appendChild(svgEl('text', { x: W / 2, y: H / 2, 'text-anchor': 'middle', class: 'empty' }, 'Zatím žádné odpovědi'));
 
   function label(bin) {
-    return bin.to === Infinity ? `${bin.from / 1000} s a více` : `${bin.from / 1000}–${bin.to / 1000} s`;
+    const sec = (ms) => String(ms / 1000).replace('.', ',');
+    return bin.to === Infinity ? `${sec(bin.from)} s a více` : `${sec(bin.from)}–${sec(bin.to)} s`;
   }
 }
 

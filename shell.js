@@ -1,0 +1,166 @@
+// Page markup shared by all apps; mode-specific bits are switched by the mode config.
+
+import { MODES, MODE_ORDER } from './modes.js';
+
+function appLinks(mode) {
+  const toRoot = mode.path ? '../' : '';
+  return MODE_ORDER.filter((id) => id !== mode.id)
+    .map((id) => `<a class="app-link" href="${toRoot + MODES[id].path || './'}">${MODES[id].title}</a>`)
+    .join('');
+}
+
+export function shellHtml(mode) {
+  const opChoice = mode.opChoice
+    ? `<label>Operace
+        <select id="set-ops">
+          <option value="both">Násobení i dělení</option>
+          <option value="mul">Jen násobení</option>
+          <option value="div">Jen dělení</option>
+        </select>
+      </label>`
+    : '';
+  const heatmapOp = mode.heatmapOps.length > 1
+    ? `<div class="row">
+        <div class="segment" id="heatmap-op">
+          <button data-op="mul" class="active">Násobení</button>
+          <button data-op="div">Dělení</button>
+        </div>
+      </div>`
+    : '';
+  return `
+  <div id="notice" class="notice" hidden></div>
+
+  <!-- Profiles -->
+  <section id="screen-profiles" class="screen">
+    <p class="app-title">${mode.title}</p>
+    <h1>Kdo hraje?</h1>
+    <div id="profile-list" class="profile-list"></div>
+    <form id="form-add-profile" class="row" autocomplete="off">
+      <input id="new-profile-name" type="text" placeholder="Jméno" maxlength="20" required />
+      <button id="btn-add-profile" type="submit" class="btn primary">Přidat</button>
+    </form>
+    <nav class="apps">${appLinks(mode)}</nav>
+  </section>
+
+  <!-- Home -->
+  <section id="screen-home" class="screen" hidden>
+    <p class="app-title">${mode.title}</p>
+    <h1 id="home-name"></h1>
+    <p id="home-summary" class="muted"></p>
+    <div class="stack">
+      <button id="btn-start" class="btn primary big">Start kola</button>
+      <button id="btn-stats" class="btn big">Statistiky</button>
+      <button id="btn-settings" class="btn big">Nastavení</button>
+      <button id="btn-switch-profile" class="btn link">Změnit profil</button>
+    </div>
+    <nav class="apps">${appLinks(mode)}</nav>
+  </section>
+
+  <!-- Settings -->
+  <section id="screen-settings" class="screen" hidden>
+    <h1>Nastavení</h1>
+    <form id="form-settings" class="form">
+      <label>Počet příkladů v kole
+        <input id="set-count" type="number" min="5" max="200" step="1" required />
+      </label>
+      ${opChoice}
+      <label>Zelená do (sekundy)
+        <input id="set-green" type="number" min="0.5" max="60" step="0.5" required />
+      </label>
+      <label>Oranžová do (sekundy)
+        <input id="set-orange" type="number" min="1" max="120" step="0.5" required />
+      </label>
+      <label class="check">
+        <input id="set-sound" type="checkbox" /> Zvuky při odpovědi (pro celé zařízení)
+      </label>
+      <div class="row">
+        <button id="btn-save-settings" type="submit" class="btn primary">Uložit</button>
+        <button id="btn-cancel-settings" type="button" class="btn">Zpět</button>
+      </div>
+    </form>
+    <h2>Data</h2>
+    <div class="stack">
+      <button id="btn-export" class="btn">Export JSON</button>
+      <label class="btn file-btn">Import JSON
+        <input id="import-file" type="file" accept="application/json,.json" hidden />
+      </label>
+      <button id="btn-wipe" class="btn danger">Smazat všechna data profilu</button>
+      <button id="btn-wipe-confirm" class="btn danger" hidden>Opravdu smazat?</button>
+    </div>
+  </section>
+
+  <!-- Round -->
+  <section id="screen-round" class="screen round" hidden>
+    <header class="round-header">
+      <span id="progress" class="progress"></span>
+      <button id="btn-abort" class="btn small">Přerušit</button>
+    </header>
+    <div id="question" class="question question-${mode.id}"></div>
+    <div id="answer-display" class="answer-display">&nbsp;</div>
+    <div id="feedback" class="feedback"></div>
+    <button id="btn-next" class="btn primary big" hidden>Dál</button>
+    <div class="numpad">
+      <button data-key="7">7</button><button data-key="8">8</button><button data-key="9">9</button>
+      <button data-key="4">4</button><button data-key="5">5</button><button data-key="6">6</button>
+      <button data-key="1">1</button><button data-key="2">2</button><button data-key="3">3</button>
+      <button data-key="back" class="back">⌫</button><button data-key="0">0</button><button data-key="ok" class="ok">OK</button>
+    </div>
+  </section>
+
+  <!-- Summary -->
+  <section id="screen-summary" class="screen" hidden>
+    <h1>Hotovo!</h1>
+    <p id="summary-text" class="summary-text"></p>
+    <h2>Nejpomalejší</h2>
+    <ol id="summary-slowest" class="slowest"></ol>
+    <div class="stack">
+      <button id="btn-again" class="btn primary big">Ještě jednou</button>
+      <button id="btn-summary-stats" class="btn big">Statistiky</button>
+      <button id="btn-summary-home" class="btn link">Domů</button>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section id="screen-stats" class="screen stats" hidden>
+    <header class="row space">
+      <h1>Statistiky</h1>
+      <button id="btn-stats-home" class="btn small">Domů</button>
+    </header>
+    <nav class="tabs" id="stats-tabs">
+      <button data-tab="heatmap" class="tab active">Heatmapa</button>
+      <button data-tab="histogram" class="tab">Histogram</button>
+      <button data-tab="trend" class="tab">Vývoj</button>
+    </nav>
+
+    <div id="tab-heatmap" class="tab-panel">
+      ${heatmapOp}
+      <div id="heatmap" class="heatmap"></div>
+      <p class="legend">
+        <span class="sw green"></span> rychle
+        <span class="sw orange"></span> pomaleji
+        <span class="sw red"></span> pomalu
+        <span class="sw none"></span> ještě nehráno
+        <span class="sw dot"></span> chyba v posledních 5
+        <span class="sw dot fix"></span> opraveno napoprvé špatně
+      </p>
+      <div id="fact-history" class="fact-history" hidden></div>
+    </div>
+
+    <div id="tab-histogram" class="tab-panel" hidden>
+      <div class="row space">
+        <div class="segment" id="hist-filter">
+          <button data-filter="last" class="active">Poslední kolo</button>
+          <button data-filter="all">Vše</button>
+        </div>
+        <span id="hist-total" class="muted"></span>
+      </div>
+      <svg id="histogram" class="chart" viewBox="0 0 640 320" role="img" aria-label="Histogram časů odpovědí"></svg>
+    </div>
+
+    <div id="tab-trend" class="tab-panel" hidden>
+      <p class="muted">Medián času (čára) a chybovost (sloupce) po kolech.</p>
+      <svg id="trend" class="chart" viewBox="0 0 640 320" role="img" aria-label="Vývoj po kolech"></svg>
+    </div>
+  </section>
+`;
+}

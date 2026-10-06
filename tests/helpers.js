@@ -1,8 +1,8 @@
 // Shared UI helpers for the Playwright scenarios.
 const { expect } = require('@playwright/test');
 
-async function createProfile(page, name = 'Ema') {
-  await page.goto('/');
+async function createProfile(page, name = 'Ema', url = '/') {
+  await page.goto(url);
   await page.fill('#new-profile-name', name);
   await page.click('#btn-add-profile');
   await page.click(`#profile-list button.profile:has-text("${name}")`);
@@ -21,7 +21,9 @@ async function setSettings(page, { count, ops, green, orange, sound } = {}) {
 }
 
 function correctAnswer(op, a, b) {
-  return op === 'mul' ? a * b : b;
+  if (op === 'mul' || op === 'mul2') return a * b;
+  if (op === 'half') return a / 2;
+  return b;
 }
 
 async function readQuestion(page) {
@@ -44,8 +46,11 @@ async function typeAnswer(page, value) {
   if (stillOnRound && shown === String(value)) await page.click('.numpad button[data-key="ok"]');
 }
 
-/** Plays until the summary screen shows. `wrongOn` = zero-based indexes to answer wrongly. */
-async function playRound(page, { wrongOn = [] } = {}) {
+/**
+ * Plays until the summary screen shows. `wrongOn` = zero-based indexes to answer wrongly.
+ * `hint` = the mode shows a hint after a mistake and waits for "Dál" (the bigger apps).
+ */
+async function playRound(page, { wrongOn = [], hint = false } = {}) {
   const asked = [];
   let i = 0;
   while (!(await page.locator('#screen-summary').isVisible())) {
@@ -54,6 +59,12 @@ async function playRound(page, { wrongOn = [] } = {}) {
     const correct = correctAnswer(q.op, q.a, q.b);
     if (wrongOn.includes(i)) {
       await typeAnswer(page, correct + 1);
+      if (hint) {
+        await expect(page.locator('#feedback')).toContainText(String(correct));
+        await page.click('#btn-next');
+        i++;
+        continue;
+      }
       await expect(page.locator('#feedback')).toContainText('Správně:');
       await expect(page.locator('#feedback')).not.toContainText('Správně:', { timeout: 5000 });
     } else {
