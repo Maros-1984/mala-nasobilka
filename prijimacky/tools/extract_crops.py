@@ -25,8 +25,8 @@ LEFT_MARGIN_X = 85             # task numbers and headers start left of this
 
 # Matched against text with all whitespace removed: some PDFs print "m ax. 2 bo d y".
 POINTS_RE = re.compile(r"^(?:max\.)?(\d+)bod(?:y|ů)?$")
-HEADER_RE = re.compile(r"^VÝCHOZÍTEXTY?")
-RANGE_RE = re.compile(r"KÚLOH(?:ÁM|AM|Y)?(\d+)(?:[–-](\d+))?|KÚLOZE(\d+)")
+HEADER_RE = re.compile(r"^VÝCHOZÍ(?:TEXT|OBRÁZ)")
+RANGE_RE = re.compile(r"KÚLOH(?:ÁM|AM|Y)?(\d+)(?:[–-](\d+))?|KÚLOH?ZE(\d+)")
 
 
 def lines_of(page):
@@ -127,12 +127,13 @@ def region_parts(start, end, npages, bottoms=None):
     return parts
 
 
-def render(doc, parts, out_path, x0=LEFT, x1=RIGHT):
+def render(doc, parts, out_path, x0=LEFT, x1=RIGHT, color=False):
     images = []
     for p, y0, y1 in parts:
         clip = pymupdf.Rect(x0, y0, x1, y1)
-        pix = doc[p].get_pixmap(matrix=pymupdf.Matrix(ZOOM, ZOOM), clip=clip, colorspace=pymupdf.csGRAY)
-        img = Image.frombytes("L", (pix.width, pix.height), pix.samples)
+        cs = pymupdf.csRGB if color else pymupdf.csGRAY
+        pix = doc[p].get_pixmap(matrix=pymupdf.Matrix(ZOOM, ZOOM), clip=clip, colorspace=cs, alpha=False)
+        img = Image.frombytes("RGB" if color else "L", (pix.width, pix.height), pix.samples)
         img = squeeze(img)
         if img is not None:
             images.append(img)
@@ -141,19 +142,19 @@ def render(doc, parts, out_path, x0=LEFT, x1=RIGHT):
     width = max(i.width for i in images)
     gap = MAX_GAP_PX
     total = sum(i.height for i in images) + gap * (len(images) - 1)
-    canvas = Image.new("L", (width, total), 255)
+    canvas = Image.new("RGB" if color else "L", (width, total), (255, 255, 255) if color else 255)
     y = 0
     for img in images:
         canvas.paste(img, (0, y))
         y += img.height + gap
-    canvas.quantize(16).save(out_path, optimize=True)
+    canvas.quantize(64 if color else 16).save(out_path, optimize=True)
     return True
 
 
 def squeeze(img):
     """Trim white top/bottom and collapse long white bands."""
     w, h = img.size
-    px = img.load()
+    px = img.convert("L").load()
     ink = []
     for y in range(h):
         row_has_ink = False
@@ -176,7 +177,7 @@ def squeeze(img):
             run += 1
             if run <= MAX_GAP_PX:
                 keep.append(y)
-    out = Image.new("L", (w, len(keep)), 255)
+    out = Image.new(img.mode, (w, len(keep)), (255, 255, 255) if img.mode == "RGB" else 255)
     for i, y in enumerate(keep):
         out.paste(img.crop((0, y, w, y + 1)), (0, i))
     return out
