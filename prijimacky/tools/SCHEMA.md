@@ -44,7 +44,7 @@ Optional `label` is a very short hint shown next to the input when the id alone 
 
 | type | extra fields | UI | correct when |
 |---|---|---|---|
-| `choice` | `options` (letters, e.g. `["A","B","C","D","E"]`), `answer` (letter) | letter buttons | same letter |
+| `choice` | `options` (letters, e.g. `["A","B","C","D","E"]`), `answer` (letter), optional `accept` (other correct letters) | letter buttons | same letter as `answer` or one in `accept` |
 | `yesno` | `answer`: `"A"` (ano / pravdivé) or `"N"` | ANO / NE buttons | same |
 | `match` | `options` (letters), `answer` (letter) | letter buttons per part | same letter. Use it for matching tasks (one part per item) and for ordering tasks (one part per slot, `label` = slot name like "První část") |
 | `number` | `answer` (string as in key, digits only, e.g. `"80000"`, `"4.5"`), optional `unit` (shown after the input, e.g. `"Kč"`, `"cm²"`, `"min"`), optional `accept` (other accepted strings), optional `partial`: `[{"answer": "50", "points": 1}]` | number field | numeric value equals `answer` or any `accept` (spaces ignored, `,` = `.`) |

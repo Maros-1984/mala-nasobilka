@@ -58,7 +58,7 @@ function gradePart(part, value, taskMax, single) {
     case 'choice':
     case 'match':
     case 'yesno': {
-      const correct = value === part.answer;
+      const correct = value != null && [part.answer, ...(part.accept || [])].includes(value);
       return { correct, points: correct ? max : 0 };
     }
     case 'number':
@@ -111,6 +111,9 @@ export function expectedText(part) {
   switch (part.type) {
     case 'yesno':
       return part.answer === 'A' ? 'ANO' : 'NE';
+    case 'choice':
+    case 'match':
+      return [part.answer, ...(part.accept || [])].join(' nebo ');
     case 'number':
       return formatNumber(part.answer) + (part.unit ? ` ${part.unit}` : '');
     case 'set':

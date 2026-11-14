@@ -31,8 +31,9 @@ def check_part(p, where, errors):
         opts = p.get("options") or []
         if not opts or not all(LETTERS.match(o) for o in opts):
             errors.append(f"{where}: bad options {opts}")
-        if p.get("answer") not in opts:
-            errors.append(f"{where}: answer {p.get('answer')!r} not in options")
+        for a in [p.get("answer")] + p.get("accept", []):
+            if a not in opts:
+                errors.append(f"{where}: answer {a!r} not in options")
     elif t == "yesno":
         if p.get("answer") not in ("A", "N"):
             errors.append(f"{where}: yesno answer must be A or N")
