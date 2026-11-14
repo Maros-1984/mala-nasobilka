@@ -89,11 +89,20 @@ def attach_numbers(markers):
     return out
 
 
-def body_bottom(page):
-    """Bottom of the page body: just above the page-number footer."""
+def blank_footer(page):
+    """White out the page number and return where the page body ends.
+
+    The last text line can reach as low as the page number, so the number is
+    redacted instead of cutting above it.
+    """
     h = page.rect.height
-    footer = [l[1] for l in lines_of(page) if l[1] > h - 60 and re.fullmatch(r"\d{1,2}", l[2].strip())]
-    return min(footer) - 2 if footer else h - 24
+    for b in page.get_text("dict")["blocks"]:
+        for l in b.get("lines", []):
+            text = "".join(s["text"] for s in l["spans"]).strip()
+            if l["bbox"][1] > h - 60 and re.fullmatch(r"\d{1,2}", text):
+                page.add_redact_annot(pymupdf.Rect(l["bbox"]) + (-2, -2, 2, 2), fill=(1, 1, 1))
+    page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE)
+    return h - 12
 
 
 def region_parts(start, end, npages, bottoms=None):
@@ -172,7 +181,7 @@ def process(data, test_id):
         if f.name[0] in "thg":   # keep k*.png key crops cut by crop_key.py
             f.unlink()
     markers = find_markers(doc)
-    bottoms = [body_bottom(p) for p in doc]
+    bottoms = [blank_footer(p) for p in doc]
     end_of_doc = (len(doc) - 1, bottoms[-1] + 4)
 
     tasks, groups = {}, {}
