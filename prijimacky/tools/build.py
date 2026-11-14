@@ -1,6 +1,7 @@
 """Encrypt the task data into prijimacky/data/ for the app.
 
-Usage: python build.py <data> [<out-dir>]   (out-dir defaults to ../data next to this script)
+Usage: python build.py <data> [<out-dir>] [--from-year YYYY]
+(out-dir defaults to ../data next to this script; --from-year leaves out older tests)
 
 Takes every test whose task file passes validate.py. Writes:
   index.bin      {tests: [...], tasks: [{t, n, points, group}]}
@@ -9,8 +10,9 @@ Images are embedded as data URLs. Each file is a 12-byte IV followed by the AES-
 The key lives in <data>/key.txt (created on first run) and never enters the repository.
 """
 import base64
+import hashlib
+import hmac
 import json
-import os
 import secrets
 import sys
 from pathlib import Path
@@ -40,16 +42,24 @@ def img(path):
 
 
 def encrypt(key, obj, out):
-    iv = os.urandom(12)
     body = json.dumps(obj, ensure_ascii=False, separators=(",", ":")).encode()
+    # IV derived from key + content: unchanged tests give byte-identical files (no git churn),
+    # and different contents never share an IV.
+    iv = hmac.new(key, body, hashlib.sha256).digest()[:12]
     out.write_bytes(iv + AESGCM(key).encrypt(iv, body, None))
     return len(body)
 
 
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
-    data = Path(sys.argv[1])
-    out = Path(sys.argv[2]) if len(sys.argv) > 2 else HERE.parent / "data"
+    args = sys.argv[1:]
+    from_year = 0
+    if "--from-year" in args:
+        i = args.index("--from-year")
+        from_year = int(args[i + 1])
+        del args[i:i + 2]
+    data = Path(args[0])
+    out = Path(args[1]) if len(args) > 1 else HERE.parent / "data"
     out.mkdir(parents=True, exist_ok=True)
     key_text, key = load_key(data)
     manifest = json.loads((HERE / "manifest.json").read_text(encoding="utf-8"))
@@ -57,6 +67,8 @@ def main():
     index = {"tests": [], "tasks": []}
     for t in manifest["tests"]:
         tid = t["id"]
+        if t["year"] < from_year:
+            continue
         crops = data / "crops" / tid
         if not (data / "tasks" / f"{tid}.json").exists():
             print(f"{tid}: skipped, no task file")

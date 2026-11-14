@@ -97,6 +97,12 @@ def attach_numbers(markers):
     return out
 
 
+FOOTER_RE = re.compile(
+    r"^\d{1,2}(\s*/\s*\d{1,2})?$|©|Centr\w* pro zjišťování|autorských práv|veřejně nepřístupná"
+    r"|Obsah testového sešitu|obecně závazných|nepřímou podporu|přímou i nepřímou|komerční účely",
+    re.IGNORECASE)
+
+
 def blank_footer(page):
     """White out the page number and return where the page body ends.
 
@@ -107,7 +113,7 @@ def blank_footer(page):
     for b in page.get_text("dict")["blocks"]:
         for l in b.get("lines", []):
             text = "".join(s["text"] for s in l["spans"]).strip()
-            footer = re.fullmatch(r"\d{1,2}", text) or "©" in text or "Centrum pro zjišťování" in text
+            footer = FOOTER_RE.search(text)
             if l["bbox"][1] > h - 60 and footer:
                 page.add_redact_annot(pymupdf.Rect(l["bbox"]) + (0, 3, 0, 0), fill=(1, 1, 1))  # top inset: never touch the line above
     page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE)
