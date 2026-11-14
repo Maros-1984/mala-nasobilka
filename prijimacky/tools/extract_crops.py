@@ -89,15 +89,23 @@ def attach_numbers(markers):
     return out
 
 
-def region_parts(start, end, npages):
+def body_bottom(page):
+    """Bottom of the page body: just above the page-number footer."""
+    h = page.rect.height
+    footer = [l[1] for l in lines_of(page) if l[1] > h - 60 and re.fullmatch(r"\d{1,2}", l[2].strip())]
+    return min(footer) - 2 if footer else h - 24
+
+
+def region_parts(start, end, npages, bottoms=None):
     """Split (page, y) -> (page, y) into per-page (page, y0, y1) slices."""
     (p0, y0), (p1, y1) = start, end
     parts = []
     for p in range(p0, min(p1, npages - 1) + 1):
+        bottom = bottoms[p] if bottoms else BOTTOM
         a = y0 - 4 if p == p0 else TOP
-        b = y1 - 4 if p == p1 else BOTTOM
+        b = y1 - 4 if p == p1 else bottom
         if b - a > 8:
-            parts.append((p, max(a, TOP), min(b, BOTTOM)))
+            parts.append((p, max(a, TOP), min(b, bottom)))
     return parts
 
 
@@ -161,9 +169,11 @@ def process(data, test_id):
     out = data / "crops" / test_id
     out.mkdir(parents=True, exist_ok=True)
     for f in out.glob("*.png"):
-        f.unlink()
+        if f.name[0] in "thg":   # keep k*.png key crops cut by crop_key.py
+            f.unlink()
     markers = find_markers(doc)
-    end_of_doc = (len(doc) - 1, BOTTOM + 4)
+    bottoms = [body_bottom(p) for p in doc]
+    end_of_doc = (len(doc) - 1, bottoms[-1] + 4)
 
     tasks, groups = {}, {}
     current = None
@@ -173,7 +183,7 @@ def process(data, test_id):
             continue  # sub-part header inside the current task (e.g. 7.1, 7.2)
         nxt = next_boundary(markers, i, current if kind == "task" else None)
         stop = (nxt[0], nxt[1]) if nxt else end_of_doc
-        parts = region_parts((pno, y), stop, len(doc))
+        parts = region_parts((pno, y), stop, len(doc), bottoms)
         if kind == "task":
             n = data_["n"]
             current = n
