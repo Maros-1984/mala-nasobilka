@@ -19,7 +19,7 @@ from PIL import Image
 
 ZOOM = 2.0
 LEFT, RIGHT = 54, 562          # fixed horizontal window, same text scale in every crop
-TOP, BOTTOM = 30, 806          # page body without the page-number footer
+TOP, BOTTOM = 16, 806          # page body without the page-number footer
 MAX_GAP_PX = 34                # longer white bands get collapsed to this height
 LEFT_MARGIN_X = 85             # task numbers and headers start left of this
 
