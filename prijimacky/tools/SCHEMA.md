@@ -1,6 +1,10 @@
 # Task answer data – `<data>/tasks/<TEST_ID>.json`
 
-One file per test. It holds everything the app needs except the images. The crops and points
+One file per test. It holds everything the app needs except the images.
+
+If a test PDF has no usable text layer (scans, broken font encodings), the crops come from a hand-made
+region map `<data>/manual/<TEST_ID>.json` instead. See `process_manual` in `extract_crops.py` and use
+`render_pages.py` to get page images with a y-ruler. The crops and points
 come from `<data>/crops/<TEST_ID>/layout.json`, which is generated; never edit it.
 
 ```json
@@ -63,7 +67,8 @@ The maximum points of the scoring must equal `points` of the task in `layout.jso
 `explanation.md` is a small Markdown subset: paragraphs separated by a blank line, `**bold**`,
 `*italic*`, lines starting with `- ` for lists, and `x²`-style Unicode for powers. No HTML, no tables.
 
-- `source: "cermat"`: the text of the CERMAT commented solution for this task, transcribed faithfully.
+- Part ids must be unique within a task (answers are stored by id).
+- `source: "cermat"`: the text of the CERMAT commented solution (Czech "komentovaná verze", maths "vzorové řešení" / "průvodce řešením") for this task, transcribed faithfully.
   Light cleanup is fine: join broken lines and drop page headers. Keep their wording.
 - `source: "ai"`: your own explanation for a 11-year-old, in Czech: how to think about the task step by
   step and why the right answer is right (for choice tasks, also briefly why the tempting wrong options are
