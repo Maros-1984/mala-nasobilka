@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#1d4ed8" />
+  <title>Přijímačky nanečisto</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <section id="loading" class="screen narrow">
+    <p class="muted">Načítám…</p>
+  </section>
+
+  <section id="lock" class="screen narrow" hidden>
+    <h1>Přijímačky nanečisto</h1>
+    <p id="lockMsg">Úlohy jsou zašifrované. Otevři stránku přes odkaz s klíčem.</p>
+    <form id="lockForm" class="stack">
+      <label for="lockInput">Odkaz nebo klíč</label>
+      <input id="lockInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" />
+      <button class="primary" type="submit">Otevřít</button>
+    </form>
+  </section>
+
+  <section id="filter" class="screen narrow" hidden>
+    <h1>Přijímačky nanečisto</h1>
+    <p class="muted">Úlohy z jednotných přijímacích zkoušek na osmiletá gymnázia (CERMAT).</p>
+
+    <fieldset>
+      <legend>Předmět</legend>
+      <div class="chips" id="subjects">
+        <label class="chip"><input type="checkbox" value="CJ" /><span>Čeština</span></label>
+        <label class="chip"><input type="checkbox" value="MA" /><span>Matematika</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Body za úlohu</legend>
+      <div class="chips" id="points"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Roky</legend>
+      <div class="years">
+        <label>od <select id="yearFrom"></select></label>
+        <label>do <select id="yearTo"></select></label>
+      </div>
+    </fieldset>
+
+    <p id="poolInfo" class="muted"></p>
+    <button id="start" class="primary big" type="button">Začít</button>
+
+    <div id="stats" class="stats"></div>
+
+    <details class="more">
+      <summary>Další možnosti</summary>
+      <p class="muted">Pokrok se ukládá jen v tomto zařízení.</p>
+      <button id="resetProgress" type="button">Smazat pokrok</button>
+      <p class="muted small">Zdroj úloh: <a href="https://prijimacky.cermat.gov.cz/menu/testova-zadani-k-procvicovani.html" target="_blank" rel="noopener">CERMAT – testová zadání k procvičování</a>. Jen pro osobní procvičování.</p>
+    </details>
+  </section>
+
+  <section id="task" class="screen" hidden>
+    <header class="bar">
+      <button id="back" type="button" class="icon" aria-label="Zpět na výběr">←</button>
+      <div id="meta" class="meta"></div>
+      <button id="zoomOut" type="button" class="icon" aria-label="Zmenšit">A−</button>
+      <button id="zoomIn" type="button" class="icon" aria-label="Zvětšit">A+</button>
+      <button id="fullscreen" type="button" class="icon" aria-label="Celá obrazovka" hidden>⛶</button>
+    </header>
+    <div id="taskBody" class="task-body">
+      <div id="source" class="source"></div>
+      <div class="main">
+        <div id="crops" class="crops"></div>
+        <form id="answers" class="answers" autocomplete="off"></form>
+        <div id="result" class="result" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
