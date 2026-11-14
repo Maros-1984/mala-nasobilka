@@ -83,6 +83,15 @@ test('number set accepts space separated values', () => {
   assert.equal(gradeTask(task, 3, { 2: '10, 13, 15' }).points, 1);
 });
 
+test('set items can list alternatives', () => {
+  const part = { id: '17', type: 'set', kind: 'text', answer: ['vydali|vydali se', 'šli'], table: { 0: 2, 1: 1 } };
+  const task = { parts: [part], scoring: { type: 'sum' } };
+  assert.equal(gradeTask(task, 2, { 17: 'vydali se, šli' }).points, 2);
+  assert.equal(gradeTask(task, 2, { 17: 'šli, vydali' }).points, 2);
+  assert.equal(gradeTask(task, 2, { 17: 'vydali, vydali se' }).points, 0);
+  assert.equal(expectedText(part), 'vydali / vydali se, šli');
+});
+
 test('all scoring for ordering tasks', () => {
   const slots = ['F', 'A', 'D'].map((answer, i) => ({ id: `13.${i + 1}`, type: 'match', options: ['A', 'B', 'C', 'D', 'E', 'F'], answer }));
   const task = { parts: slots, scoring: { type: 'all', points: 3 } };

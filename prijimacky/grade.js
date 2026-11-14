@@ -29,12 +29,19 @@ function splitItems(value, kind) {
   return kind === 'number' ? items.map((s) => String(parseNumber(s))) : items.map(normalizeText);
 }
 
+// Each expected item may list alternatives separated by "|" (e.g. "vydali|vydali se").
 function setErrors(part, value) {
-  const want = new Set(part.kind === 'number' ? part.answer.map((s) => String(parseNumber(s))) : part.answer.map(normalizeText));
-  const given = new Set(splitItems(value, part.kind));
+  const norm = (s) => (part.kind === 'number' ? String(parseNumber(s)) : normalizeText(s));
+  const want = part.answer.map((item) => item.split('|').map(norm));
+  const given = [...new Set(splitItems(value, part.kind))];
+  const used = new Set();
   let errors = 0;
-  for (const w of want) if (!given.has(w)) errors++;
-  for (const g of given) if (!want.has(g)) errors++;
+  for (const alts of want) {
+    const hit = given.find((g) => !used.has(g) && alts.includes(g));
+    if (hit === undefined) errors++;
+    else used.add(hit);
+  }
+  errors += given.filter((g) => !used.has(g)).length;
   return errors;
 }
 
@@ -107,7 +114,7 @@ export function expectedText(part) {
     case 'number':
       return formatNumber(part.answer) + (part.unit ? ` ${part.unit}` : '');
     case 'set':
-      return part.answer.join(', ');
+      return part.answer.map((a) => a.split('|').join(' / ')).join(', ');
     default:
       return String(part.answer);
   }
