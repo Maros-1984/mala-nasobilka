@@ -18,7 +18,7 @@ import pymupdf
 from PIL import Image
 
 ZOOM = 2.0
-LEFT, RIGHT = 62, 540          # fixed horizontal window, same text scale in every crop
+LEFT, RIGHT = 54, 562          # fixed horizontal window, same text scale in every crop
 TOP, BOTTOM = 30, 806          # page body without the page-number footer
 MAX_GAP_PX = 34                # longer white bands get collapsed to this height
 LEFT_MARGIN_X = 85             # task numbers and headers start left of this
@@ -100,7 +100,7 @@ def blank_footer(page):
         for l in b.get("lines", []):
             text = "".join(s["text"] for s in l["spans"]).strip()
             if l["bbox"][1] > h - 60 and re.fullmatch(r"\d{1,2}", text):
-                page.add_redact_annot(pymupdf.Rect(l["bbox"]) + (-2, -2, 2, 2), fill=(1, 1, 1))
+                page.add_redact_annot(pymupdf.Rect(l["bbox"]) + (0, 3, 0, 0), fill=(1, 1, 1))  # top inset: never touch the line above
     page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE)
     return h - 12
 
