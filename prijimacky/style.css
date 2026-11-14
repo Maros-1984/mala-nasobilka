@@ -194,7 +194,10 @@ img.crop {
 .options { display: flex; flex-wrap: wrap; gap: 8px; }
 .opt { min-width: 52px; font-weight: 600; }
 .opt.selected { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
-.part.bad .opt.right, .part.ok .opt.right { outline: 3px solid var(--ok); outline-offset: 1px; }
+.answers .opt:disabled, .answers input:disabled { opacity: 1; }
+.part.bad .opt.selected { background: var(--bad); border-color: var(--bad); }
+.part.ok .opt.selected { background: var(--ok); border-color: var(--ok); }
+.part.bad .opt.right { outline: 3px solid var(--ok); outline-offset: 1px; }
 .field { display: inline-flex; align-items: center; gap: 6px; flex: 1; min-width: 10em; }
 .field input { flex: 1; min-width: 0; }
 .part-set .field { flex-basis: 100%; }
