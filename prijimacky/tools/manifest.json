@@ -1,44 +1,428 @@
 {
-  "base": "https://prijimacky.cermat.gov.cz",
-  "tests": [
-    {"id": "M5A_2026", "subject": "MA", "year": 2026, "term": "1. řádný termín",
-     "test": "/files/files/dokumenty/M5A_2026_TS.pdf", "key": "/files/files/dokumenty/M5A_2026_KSR.pdf"},
-    {"id": "M5B_2026", "subject": "MA", "year": 2026, "term": "2. řádný termín",
-     "test": "/files/files/dokumenty/M5B_2026_TS.pdf", "key": "/files/files/dokumenty/M5B_2026_KSR.pdf"},
-    {"id": "M5C_2026", "subject": "MA", "year": 2026, "term": "1. náhradní termín",
-     "test": "/files/files/M5C_2026_TS.pdf", "key": "/files/files/dokumenty/M5C_2026_KSR.pdf"},
-    {"id": "M5D_2026", "subject": "MA", "year": 2026, "term": "2. náhradní termín",
-     "test": "/files/files/M5D_2026_TS.pdf", "key": "/files/files/dokumenty/M5D_2026_KSR.pdf"},
-    {"id": "M5A_2025", "subject": "MA", "year": 2025, "term": "1. řádný termín",
-     "test": "/files/files/M5A_2025_TS.pdf", "key": "/files/files/dokumenty/M5A_2025_rozsireny_klic.pdf"},
-    {"id": "M5B_2025", "subject": "MA", "year": 2025, "term": "2. řádný termín",
-     "test": "/files/files/M5B_2025_TS.pdf", "key": "/files/files/dokumenty/M5B_2025_rozsireny_klic.pdf"},
-    {"id": "M5C_2025", "subject": "MA", "year": 2025, "term": "1. náhradní termín",
-     "test": "/files/files/M5C_2025_TS.pdf", "key": "/files/files/dokumenty/M5C_2025_rozsireny_klic.pdf"},
-    {"id": "M5D_2025", "subject": "MA", "year": 2025, "term": "2. náhradní termín",
-     "test": "/files/files/M5D_2025_TS.pdf", "key": "/files/files/dokumenty/M5D_2025_rozsireny_klic.pdf"},
-
-    {"id": "C5A_2026", "subject": "CJ", "year": 2026, "term": "1. řádný termín",
-     "test": "/files/files/dokumenty/C5A_2026_TS.pdf", "key": "/files/files/C5A_2026_KSR.pdf",
-     "comment": "/files/files/C5A_2026_komentovana_verze.pdf"},
-    {"id": "C5B_2026", "subject": "CJ", "year": 2026, "term": "2. řádný termín",
-     "test": "/files/files/dokumenty/C5B_2026_TS.pdf", "key": "/files/files/C5B_2026_KSR.pdf",
-     "comment": "/files/files/C5B_2026_komentovana_verze.pdf"},
-    {"id": "C5C_2026", "subject": "CJ", "year": 2026, "term": "1. náhradní termín",
-     "test": "/files/files/C5C_2026_TS.pdf", "key": "/files/files/C5C_2026_KSR.pdf",
-     "comment": "/files/files/C5C_2026_komentovana_verze.pdf"},
-    {"id": "C5D_2026", "subject": "CJ", "year": 2026, "term": "2. náhradní termín",
-     "test": "/files/files/C5D_2026_TS.pdf", "key": "/files/files/C5D_2026_KSR.pdf",
-     "comment": "/files/files/C5D_2026_komentovana_verze.pdf"},
-    {"id": "C5A_2025", "subject": "CJ", "year": 2025, "term": "1. řádný termín",
-     "test": "/files/files/C5A_2025_TS.pdf", "key": "/files/files/dokumenty/C5A_2025_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf",
-     "comment": "/files/files/C5PAD25C0T01_komentovana%CC%81_verze_FINAL.pdf"},
-    {"id": "C5B_2025", "subject": "CJ", "year": 2025, "term": "2. řádný termín",
-     "test": "/files/files/C5B_2025_TS.pdf", "key": "/files/files/dokumenty/C5B_2025_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf",
-     "comment": "/files/files/C5PBD25C0T02_komentovana%CC%81_verze_FINAL.pdf"},
-    {"id": "C5C_2025", "subject": "CJ", "year": 2025, "term": "1. náhradní termín",
-     "test": "/files/files/C5C_2025_TS.pdf", "key": "/files/files/dokumenty/C5C_2025_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf"},
-    {"id": "C5D_2025", "subject": "CJ", "year": 2025, "term": "2. náhradní termín",
-     "test": "/files/files/C5D_2025_TS.pdf", "key": "/files/files/dokumenty/C5D_2025_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf"}
-  ]
+ "base": "https://prijimacky.cermat.gov.cz",
+ "tests": [
+  {
+   "id": "M5A_2026",
+   "subject": "MA",
+   "year": 2026,
+   "term": "1. řádný termín",
+   "test": "/files/files/dokumenty/M5A_2026_TS.pdf",
+   "key": "/files/files/dokumenty/M5A_2026_KSR.pdf"
+  },
+  {
+   "id": "M5B_2026",
+   "subject": "MA",
+   "year": 2026,
+   "term": "2. řádný termín",
+   "test": "/files/files/dokumenty/M5B_2026_TS.pdf",
+   "key": "/files/files/dokumenty/M5B_2026_KSR.pdf"
+  },
+  {
+   "id": "M5C_2026",
+   "subject": "MA",
+   "year": 2026,
+   "term": "1. náhradní termín",
+   "test": "/files/files/M5C_2026_TS.pdf",
+   "key": "/files/files/dokumenty/M5C_2026_KSR.pdf"
+  },
+  {
+   "id": "M5D_2026",
+   "subject": "MA",
+   "year": 2026,
+   "term": "2. náhradní termín",
+   "test": "/files/files/M5D_2026_TS.pdf",
+   "key": "/files/files/dokumenty/M5D_2026_KSR.pdf"
+  },
+  {
+   "id": "M5A_2025",
+   "subject": "MA",
+   "year": 2025,
+   "term": "1. řádný termín",
+   "test": "/files/files/M5A_2025_TS.pdf",
+   "key": "/files/files/dokumenty/M5A_2025_rozsireny_klic.pdf"
+  },
+  {
+   "id": "M5B_2025",
+   "subject": "MA",
+   "year": 2025,
+   "term": "2. řádný termín",
+   "test": "/files/files/M5B_2025_TS.pdf",
+   "key": "/files/files/dokumenty/M5B_2025_rozsireny_klic.pdf"
+  },
+  {
+   "id": "M5C_2025",
+   "subject": "MA",
+   "year": 2025,
+   "term": "1. náhradní termín",
+   "test": "/files/files/M5C_2025_TS.pdf",
+   "key": "/files/files/dokumenty/M5C_2025_rozsireny_klic.pdf"
+  },
+  {
+   "id": "M5D_2025",
+   "subject": "MA",
+   "year": 2025,
+   "term": "2. náhradní termín",
+   "test": "/files/files/M5D_2025_TS.pdf",
+   "key": "/files/files/dokumenty/M5D_2025_rozsireny_klic.pdf"
+  },
+  {
+   "id": "C5A_2026",
+   "subject": "CJ",
+   "year": 2026,
+   "term": "1. řádný termín",
+   "test": "/files/files/dokumenty/C5A_2026_TS.pdf",
+   "key": "/files/files/C5A_2026_KSR.pdf",
+   "comment": "/files/files/C5A_2026_komentovana_verze.pdf"
+  },
+  {
+   "id": "C5B_2026",
+   "subject": "CJ",
+   "year": 2026,
+   "term": "2. řádný termín",
+   "test": "/files/files/dokumenty/C5B_2026_TS.pdf",
+   "key": "/files/files/C5B_2026_KSR.pdf",
+   "comment": "/files/files/C5B_2026_komentovana_verze.pdf"
+  },
+  {
+   "id": "C5C_2026",
+   "subject": "CJ",
+   "year": 2026,
+   "term": "1. náhradní termín",
+   "test": "/files/files/C5C_2026_TS.pdf",
+   "key": "/files/files/C5C_2026_KSR.pdf",
+   "comment": "/files/files/C5C_2026_komentovana_verze.pdf"
+  },
+  {
+   "id": "C5D_2026",
+   "subject": "CJ",
+   "year": 2026,
+   "term": "2. náhradní termín",
+   "test": "/files/files/C5D_2026_TS.pdf",
+   "key": "/files/files/C5D_2026_KSR.pdf",
+   "comment": "/files/files/C5D_2026_komentovana_verze.pdf"
+  },
+  {
+   "id": "C5A_2025",
+   "subject": "CJ",
+   "year": 2025,
+   "term": "1. řádný termín",
+   "test": "/files/files/C5A_2025_TS.pdf",
+   "key": "/files/files/dokumenty/C5A_2025_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf",
+   "comment": "/files/files/C5PAD25C0T01_komentovana%CC%81_verze_FINAL.pdf"
+  },
+  {
+   "id": "C5B_2025",
+   "subject": "CJ",
+   "year": 2025,
+   "term": "2. řádný termín",
+   "test": "/files/files/C5B_2025_TS.pdf",
+   "key": "/files/files/dokumenty/C5B_2025_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf",
+   "comment": "/files/files/C5PBD25C0T02_komentovana%CC%81_verze_FINAL.pdf"
+  },
+  {
+   "id": "C5C_2025",
+   "subject": "CJ",
+   "year": 2025,
+   "term": "1. náhradní termín",
+   "test": "/files/files/C5C_2025_TS.pdf",
+   "key": "/files/files/dokumenty/C5C_2025_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf"
+  },
+  {
+   "id": "C5D_2025",
+   "subject": "CJ",
+   "year": 2025,
+   "term": "2. náhradní termín",
+   "test": "/files/files/C5D_2025_TS.pdf",
+   "key": "/files/files/dokumenty/C5D_2025_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf"
+  },
+  {
+   "id": "M5A_2024",
+   "subject": "MA",
+   "year": 2024,
+   "term": "1. řádný termín",
+   "test": "/files/files/MA_2024_5A_TSx.pdf",
+   "key": "/files/files/M5PAD24C0K01_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf",
+   "comment": "/files/files/5A_-_%C5%99e%C5%A1en%C3%AD.pdf"
+  },
+  {
+   "id": "M5B_2024",
+   "subject": "MA",
+   "year": 2024,
+   "term": "2. řádný termín",
+   "test": "/files/files/MA_2024_5_B.pdf",
+   "key": "/files/files/M5PBD24C0K02_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf",
+   "comment": "/files/files/5B_-_%C5%99e%C5%A1en%C3%AD.pdf"
+  },
+  {
+   "id": "M5C_2024",
+   "subject": "MA",
+   "year": 2024,
+   "term": "1. náhradní termín",
+   "test": "/files/files/MA_2024_5C_TS.pdf",
+   "key": "/files/files/M5PCD24C0K03_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf",
+   "comment": "/files/files/5C_-_%C5%99e%C5%A1en%C3%AD.pdf"
+  },
+  {
+   "id": "M5D_2024",
+   "subject": "MA",
+   "year": 2024,
+   "term": "2. náhradní termín",
+   "test": "/files/files/MA_2024_5D_TS.pdf",
+   "key": "/files/files/M5PDD24C0K04_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf",
+   "comment": "/files/files/5D_-_%C5%99e%C5%A1en%C3%AD.pdf"
+  },
+  {
+   "id": "M5A_2023",
+   "subject": "MA",
+   "year": 2023,
+   "term": "1. řádný termín",
+   "test": "/files/files/M5PAD23C0T01_web.pdf",
+   "key": "/files/files/M5A_DT_23_rozsireny_klic.pdf"
+  },
+  {
+   "id": "M5B_2023",
+   "subject": "MA",
+   "year": 2023,
+   "term": "2. řádný termín",
+   "test": "/files/files/M5B_2023_DT.pdf",
+   "key": "/files/files/M5B_DT_23_rozsireny_klic.pdf"
+  },
+  {
+   "id": "M5C_2023",
+   "subject": "MA",
+   "year": 2023,
+   "term": "1. náhradní termín",
+   "test": "/files/files/M5_JPZ_2023_DT.pdf",
+   "key": "/files/files/M5C_2023_rozsireny_klic_na_web.pdf"
+  },
+  {
+   "id": "M5D_2023",
+   "subject": "MA",
+   "year": 2023,
+   "term": "2. náhradní termín",
+   "test": "/files/files/M5D_2023_DT.pdf",
+   "key": "/files/files/M5D_2023_rozsireny_klic_na_web.pdf"
+  },
+  {
+   "id": "M5A_2022",
+   "subject": "MA",
+   "year": 2022,
+   "term": "1. řádný termín",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-mat/2022/M5A_2022_DT.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-mat/2022/M5A_2022_KLIC.pdf",
+   "comment": "/files/files/dokumenty/testova-zadani/8lete-mat/2022/M5A_2022_vzorove_reseni.pdf"
+  },
+  {
+   "id": "M5B_2022",
+   "subject": "MA",
+   "year": 2022,
+   "term": "2. řádný termín",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-mat/2022/M5B_2022_DT.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-mat/2022/M5B_2022_KLIC.pdf",
+   "comment": "/files/files/dokumenty/testova-zadani/8lete-mat/2022/M5B_2022_vzorove_reseni.pdf"
+  },
+  {
+   "id": "M5C_2022",
+   "subject": "MA",
+   "year": 2022,
+   "term": "1. náhradní termín",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-mat/2022/M5C_2022_DT.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-mat/2022/M5C_2022_KLIC.pdf"
+  },
+  {
+   "id": "M5D_2022",
+   "subject": "MA",
+   "year": 2022,
+   "term": "2. náhradní termín",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-mat/2022/M5D_2022_DT.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-mat/2022/M5D_2022_KLIC.pdf"
+  },
+  {
+   "id": "M5A_2021",
+   "subject": "MA",
+   "year": 2021,
+   "term": "1. řádný termín",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-mat/2021/M5_2021_DT.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-mat/2021/M5A_2021_KLIC.pdf",
+   "comment": "/files/files/dokumenty/testova-zadani/8lete-mat/2021/M5A_2021_reseni.pdf"
+  },
+  {
+   "id": "M5B_2021",
+   "subject": "MA",
+   "year": 2021,
+   "term": "2. řádný termín",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-mat/2021/M5B_2021_DT.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-mat/2021/M5B_2021_KLIC.pdf",
+   "comment": "/files/files/dokumenty/testova-zadani/8lete-mat/2021/M5B_2021_reseni.pdf"
+  },
+  {
+   "id": "M5C_2021",
+   "subject": "MA",
+   "year": 2021,
+   "term": "1. náhradní termín",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-mat/2021/Nahradni-terminy/M5C_2021_DT.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-mat/2021/Nahradni-terminy/M5C_2021_KLIC.pdf"
+  },
+  {
+   "id": "M5D_2021",
+   "subject": "MA",
+   "year": 2021,
+   "term": "2. náhradní termín",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-mat/2021/Nahradni-terminy/M5D_2021_DT.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-mat/2021/Nahradni-terminy/M5D_2021_KLIC.pdf"
+  },
+  {
+   "id": "M5I_2021",
+   "subject": "MA",
+   "year": 2021,
+   "term": "ilustrační test",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-mat/IT_2021/M5I_2021_TEST.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-mat/IT_2021/M5I_2021_KLIC.pdf"
+  },
+  {
+   "id": "C5A_2024",
+   "subject": "CJ",
+   "year": 2024,
+   "term": "1. řádný termín",
+   "test": "/files/files/CJL_2024_5A_TS.pdf",
+   "key": "/files/files/C5PAD24C0K01_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf",
+   "comment": "/files/files/C5PAD24C0T01_komentovan%C3%A1_verze_FINAL.pdf"
+  },
+  {
+   "id": "C5B_2024",
+   "subject": "CJ",
+   "year": 2024,
+   "term": "2. řádný termín",
+   "test": "/files/files/CJL_2024_5B_TS.pdf",
+   "key": "/files/files/C5PBD24C0K02_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf",
+   "comment": "/files/files/C5PBD24C0T02_komentovana%CC%81_verze_FINAL.pdf"
+  },
+  {
+   "id": "C5C_2024",
+   "subject": "CJ",
+   "year": 2024,
+   "term": "1. náhradní termín",
+   "test": "/files/files/CJL_2024_5C_TS.pdf",
+   "key": "/files/files/C5PCD24C0K03_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf"
+  },
+  {
+   "id": "C5D_2024",
+   "subject": "CJ",
+   "year": 2024,
+   "term": "2. náhradní termín",
+   "test": "/files/files/CJL_2024_5D_TS.pdf",
+   "key": "/files/files/C5PDD24C0K04_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf"
+  },
+  {
+   "id": "C5A_2023",
+   "subject": "CJ",
+   "year": 2023,
+   "term": "1. řádný termín",
+   "test": "/files/files/C5A_2023_DT.pdf",
+   "key": "/files/files/C5A_DT_23_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf",
+   "comment": "/files/files/C5PAD23C0T01_komentovan%C3%A1_verze_FINAL.pdf"
+  },
+  {
+   "id": "C5B_2023",
+   "subject": "CJ",
+   "year": 2023,
+   "term": "2. řádný termín",
+   "test": "/files/files/C5B_2023_DT.pdf",
+   "key": "/files/files/C5B_DT_23_roz%C5%A1%C3%AD%C5%99en%C3%BD_kl%C3%AD%C4%8D.pdf",
+   "comment": "/files/files/C5PBD23C0T02_komentovan%C3%A1_verze_FINAL.pdf"
+  },
+  {
+   "id": "C5C_2023",
+   "subject": "CJ",
+   "year": 2023,
+   "term": "1. náhradní termín",
+   "test": "/files/files/CJ5C_2023_DT.pdf",
+   "key": "/files/files/C5C_2023_klic_rozsireny.pdf"
+  },
+  {
+   "id": "C5D_2023",
+   "subject": "CJ",
+   "year": 2023,
+   "term": "2. náhradní termín",
+   "test": "/files/files/C5D_2023_DT.pdf",
+   "key": "/files/files/C5D_2023_klic_rozsireny.pdf"
+  },
+  {
+   "id": "C5A_2022",
+   "subject": "CJ",
+   "year": 2022,
+   "term": "1. řádný termín",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-cj/2022/C5A_2022_DT.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-cj/2022/C5A_2022_KLIC.pdf",
+   "comment": "/files/files/dokumenty/testova-zadani/8lete-cj/2022/C5A_2022_komentovana_verze.pdf"
+  },
+  {
+   "id": "C5B_2022",
+   "subject": "CJ",
+   "year": 2022,
+   "term": "2. řádný termín",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-cj/2022/C5B_2022_DT.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-cj/2022/C5B_2022_KLIC.pdf",
+   "comment": "/files/files/dokumenty/testova-zadani/8lete-cj/2022/C5B_2022_komentovana_verze.pdf"
+  },
+  {
+   "id": "C5C_2022",
+   "subject": "CJ",
+   "year": 2022,
+   "term": "1. náhradní termín",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-cj/2022/C5C_2022_DT.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-cj/2022/C5C_2022_KLIC.pdf"
+  },
+  {
+   "id": "C5D_2022",
+   "subject": "CJ",
+   "year": 2022,
+   "term": "2. náhradní termín",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-cj/2022/C5D_2022_DT.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-cj/2022/C5D_2022_KLIC.pdf"
+  },
+  {
+   "id": "C5A_2021",
+   "subject": "CJ",
+   "year": 2021,
+   "term": "1. řádný termín",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-cj/2021/C5A_2021_DT.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-cj/2021/C5A_2021_KLIC.pdf",
+   "comment": "/files/files/dokumenty/testova-zadani/8lete-cj/2021/C5A_2021_komentovana_verze.pdf"
+  },
+  {
+   "id": "C5B_2021",
+   "subject": "CJ",
+   "year": 2021,
+   "term": "2. řádný termín",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-cj/2021/C5B_2021_DT.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-cj/2021/C5B_2021_KLIC.pdf",
+   "comment": "/files/files/dokumenty/testova-zadani/8lete-cj/2021/C5B_2021_komentovana_verze.pdf"
+  },
+  {
+   "id": "C5C_2021",
+   "subject": "CJ",
+   "year": 2021,
+   "term": "1. náhradní termín",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-cj/2021/Nahradni-terminy/C5C_2021_DT.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-cj/2021/Nahradni-terminy/C5C_2021_KLIC.pdf"
+  },
+  {
+   "id": "C5D_2021",
+   "subject": "CJ",
+   "year": 2021,
+   "term": "2. náhradní termín",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-cj/2021/Nahradni-terminy/C5D_2021_DT.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-cj/2021/Nahradni-terminy/C5D_2021_KLIC.pdf"
+  },
+  {
+   "id": "C5I_2021",
+   "subject": "CJ",
+   "year": 2021,
+   "term": "ilustrační test",
+   "test": "/files/files/dokumenty/testova-zadani/8lete-cj/IT_2021/C5I_2021_TEST.pdf",
+   "key": "/files/files/dokumenty/testova-zadani/8lete-cj/IT_2021/C5I_2021_KLIC.pdf",
+   "comment": "/files/files/dokumenty/testova-zadani/8lete-cj/IT_2021/C5I_2021_komentovana_verze.pdf"
+  }
+ ]
 }
