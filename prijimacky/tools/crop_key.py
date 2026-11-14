@@ -34,7 +34,7 @@ def main():
         name, p0, y0, p1, y1 = args[3], int(args[4]), float(args[5]), int(args[6]), float(args[7])
         parts = region_parts((p0 - 1, y0), (p1 - 1, y1), len(doc))
         out = data / "crops" / test_id / f"{name}.png"
-        if not render(doc, parts, out, x0=30, x1=566):
+        if not render(doc, parts, out, x0=30, x1=566, color=True):
             raise SystemExit("empty region")
         print(out)
     else:

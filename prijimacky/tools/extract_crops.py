@@ -23,9 +23,10 @@ TOP, BOTTOM = 30, 806          # page body without the page-number footer
 MAX_GAP_PX = 34                # longer white bands get collapsed to this height
 LEFT_MARGIN_X = 85             # task numbers and headers start left of this
 
-POINTS_RE = re.compile(r"^(?:max\.\s*)?(\d+)\s*bod(?:y|ů)?$")
-HEADER_RE = re.compile(r"^VÝCHOZÍ TEXTY?\b")
-RANGE_RE = re.compile(r"K ÚLOH(?:ÁM|AM|E|Y)?\s*(\d+)(?:\.\d+)?(?:\s*[–-]\s*(\d+))?|K ÚLOZE\s*(\d+)")
+# Matched against text with all whitespace removed: some PDFs print "m ax. 2 bo d y".
+POINTS_RE = re.compile(r"^(?:max\.)?(\d+)bod(?:y|ů)?$")
+HEADER_RE = re.compile(r"^VÝCHOZÍ(?:TEXT|OBRÁZ)")
+RANGE_RE = re.compile(r"KÚLOH(?:ÁM|AM|Y)?(\d+)(?:[–-](\d+))?|KÚLOH?ZE(\d+)")
 
 
 def lines_of(page):
@@ -47,15 +48,16 @@ def find_markers(doc):
         for x, y, text, bold, spans in lines:
             if not bold:
                 continue
-            if text.startswith("ZKONTROLUJTE"):
+            compact = re.sub(r"\s+", "", text).upper()
+            if compact.startswith("ZKONTROLUJTE"):
                 markers.append((pno, y, "end", None))
             elif x > 400:
-                m = POINTS_RE.match(text.strip())
+                m = POINTS_RE.match(compact.lower())
                 if m:
                     markers.append((pno, y, "points", int(m.group(1))))
             elif x < LEFT_MARGIN_X:
-                if HEADER_RE.match(text.upper()):
-                    markers.append((pno, y, "header", header_range(text.upper())))
+                if HEADER_RE.match(compact):
+                    markers.append((pno, y, "header", header_range(compact)))
                 elif re.fullmatch(r"\d{1,2}", spans[0]["text"].strip()):
                     markers.append((pno, y, "number", int(spans[0]["text"].strip())))
     markers.sort(key=lambda m: (m[0], m[1]))
@@ -77,16 +79,28 @@ def header_range(text):
 def attach_numbers(markers):
     """Turn points markers into task starts, using the number that follows."""
     out = []
+    out_tasks = []
     for i, (pno, y, kind, data) in enumerate(markers):
         if kind == "points":
             nxt = next((m for m in markers[i + 1:i + 3]
                         if m[2] == "number" and m[0] == pno and 0 < m[1] - y < 32), None)
-            if nxt is None:
-                raise ValueError(f"points marker without task number on page {pno + 1} y={y:.0f}")
-            out.append((pno, y, "task", {"n": nxt[3], "points": data}))
+            if nxt is not None:
+                n = nxt[3]
+            else:
+                # some tasks open straight with sub-part "6.1" and print no task number
+                n = (out_tasks[-1] + 1) if out_tasks else 1
+                print(f"  page {pno + 1} y={y:.0f}: no task number, assuming {n}")
+            out_tasks.append(n)
+            out.append((pno, y, "task", {"n": n, "points": data}))
         elif kind in ("header", "end"):
             out.append((pno, y, kind, data))
     return out
+
+
+FOOTER_RE = re.compile(
+    r"^\d{1,2}(\s*/\s*\d{1,2})?$|©|Centr\w* pro zjišťování|autorských práv|veřejně nepřístupná"
+    r"|Obsah testového sešitu|obecně závazných|nepřímou podporu|přímou i nepřímou|komerční účely",
+    re.IGNORECASE)
 
 
 def blank_footer(page):
@@ -99,7 +113,8 @@ def blank_footer(page):
     for b in page.get_text("dict")["blocks"]:
         for l in b.get("lines", []):
             text = "".join(s["text"] for s in l["spans"]).strip()
-            if l["bbox"][1] > h - 60 and re.fullmatch(r"\d{1,2}", text):
+            footer = FOOTER_RE.search(text)
+            if l["bbox"][1] > h - 60 and footer:
                 page.add_redact_annot(pymupdf.Rect(l["bbox"]) + (0, 3, 0, 0), fill=(1, 1, 1))  # top inset: never touch the line above
     page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE)
     return h - 12
@@ -118,12 +133,13 @@ def region_parts(start, end, npages, bottoms=None):
     return parts
 
 
-def render(doc, parts, out_path, x0=LEFT, x1=RIGHT):
+def render(doc, parts, out_path, x0=LEFT, x1=RIGHT, color=False):
     images = []
     for p, y0, y1 in parts:
         clip = pymupdf.Rect(x0, y0, x1, y1)
-        pix = doc[p].get_pixmap(matrix=pymupdf.Matrix(ZOOM, ZOOM), clip=clip, colorspace=pymupdf.csGRAY)
-        img = Image.frombytes("L", (pix.width, pix.height), pix.samples)
+        cs = pymupdf.csRGB if color else pymupdf.csGRAY
+        pix = doc[p].get_pixmap(matrix=pymupdf.Matrix(ZOOM, ZOOM), clip=clip, colorspace=cs, alpha=False)
+        img = Image.frombytes("RGB" if color else "L", (pix.width, pix.height), pix.samples)
         img = squeeze(img)
         if img is not None:
             images.append(img)
@@ -132,19 +148,19 @@ def render(doc, parts, out_path, x0=LEFT, x1=RIGHT):
     width = max(i.width for i in images)
     gap = MAX_GAP_PX
     total = sum(i.height for i in images) + gap * (len(images) - 1)
-    canvas = Image.new("L", (width, total), 255)
+    canvas = Image.new("RGB" if color else "L", (width, total), (255, 255, 255) if color else 255)
     y = 0
     for img in images:
         canvas.paste(img, (0, y))
         y += img.height + gap
-    canvas.quantize(16).save(out_path, optimize=True)
+    canvas.quantize(64 if color else 16).save(out_path, optimize=True)
     return True
 
 
 def squeeze(img):
     """Trim white top/bottom and collapse long white bands."""
     w, h = img.size
-    px = img.load()
+    px = img.convert("L").load()
     ink = []
     for y in range(h):
         row_has_ink = False
@@ -167,7 +183,7 @@ def squeeze(img):
             run += 1
             if run <= MAX_GAP_PX:
                 keep.append(y)
-    out = Image.new("L", (w, len(keep)), 255)
+    out = Image.new(img.mode, (w, len(keep)), (255, 255, 255) if img.mode == "RGB" else 255)
     for i, y in enumerate(keep):
         out.paste(img.crop((0, y, w, y + 1)), (0, i))
     return out
@@ -180,6 +196,8 @@ def process(data, test_id):
     for f in out.glob("*.png"):
         if f.name[0] in "thg":   # keep k*.png key crops cut by crop_key.py
             f.unlink()
+    if (data / "manual" / f"{test_id}.json").exists():
+        return process_manual(data, test_id, doc, out)
     markers = find_markers(doc)
     bottoms = [blank_footer(p) for p in doc]
     end_of_doc = (len(doc) - 1, bottoms[-1] + 4)
@@ -207,8 +225,11 @@ def process(data, test_id):
         elif kind == "header":
             current = None
             if not data_:
-                raise ValueError(f"{test_id}: header without task range on page {pno + 1}")
-            a, b = data_
+                # unreadable range: assume the header belongs to the next task
+                a = b = (max(tasks) + 1) if tasks else 1
+                print(f"  page {pno + 1}: header without task range, assuming task {a}")
+            else:
+                a, b = data_
             if a == b:
                 name = f"h{a}.png"
                 render(doc, parts, out / name)
@@ -226,10 +247,42 @@ def process(data, test_id):
     expected = list(range(1, max(tasks) + 1))
     if sorted(tasks) != expected:
         raise ValueError(f"{test_id}: tasks found {sorted(tasks)}")
+    write_layout(test_id, out, tasks, groups)
+
+
+def write_layout(test_id, out, tasks, groups):
     layout = {"tasks": {str(k): v for k, v in sorted(tasks.items())}, "groups": groups}
     (out / "layout.json").write_text(json.dumps(layout, ensure_ascii=False, indent=1), encoding="utf-8")
     total = sum(t["points"] for t in tasks.values())
     print(f"{test_id}: {len(tasks)} tasks, {total} points, {len(groups)} groups")
+
+
+def process_manual(data, test_id, doc, out):
+    """Cut a test whose text layer is unusable from a hand-made region map.
+
+    <data>/manual/<id>.json:
+      {"tasks": {"1": {"points": 4, "regions": [[page, y0, y1], ...], "header": [[page, y0, y1]]}},
+       "groups": {"g1-3": {"tasks": [1, 2, 3], "regions": [[page, y0, y1]]}}}
+    Pages are 1-based, y in PDF points (see render_pages.py). "header" is optional.
+    """
+    spec = json.loads((data / "manual" / f"{test_id}.json").read_text(encoding="utf-8"))
+    parts = lambda regions: [(p - 1, y0, y1) for p, y0, y1 in regions]
+    tasks, groups = {}, {}
+    for n, t in spec["tasks"].items():
+        crops = []
+        if t.get("header"):
+            render(doc, parts(t["header"]), out / f"h{n}.png")
+            crops.append(f"h{n}.png")
+        if not render(doc, parts(t["regions"]), out / f"t{n}.png"):
+            raise ValueError(f"{test_id}: task {n} region is empty")
+        crops.append(f"t{n}.png")
+        tasks[int(n)] = {"points": t["points"], "crops": crops, "group": None}
+    for gid, g in spec.get("groups", {}).items():
+        render(doc, parts(g["regions"]), out / f"{gid}.png")
+        groups[gid] = {"tasks": g["tasks"], "crops": [f"{gid}.png"]}
+        for n in g["tasks"]:
+            tasks[n]["group"] = gid
+    write_layout(test_id, out, tasks, groups)
 
 
 def next_boundary(markers, i, current_task):
