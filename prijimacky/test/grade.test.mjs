@@ -25,6 +25,14 @@ test('single choice task earns the task points', () => {
   assert.equal(gradeTask(task, 1, {}).points, 0);
 });
 
+test('a choice can accept more than one letter', () => {
+  const part = { id: '12', type: 'choice', options: ['A', 'B', 'C', 'D'], answer: 'B', accept: ['C'] };
+  const task = { parts: [part], scoring: { type: 'sum' } };
+  assert.equal(gradeTask(task, 1, { 12: 'C' }).points, 1);
+  assert.equal(gradeTask(task, 1, { 12: 'D' }).points, 0);
+  assert.equal(expectedText(part), 'B nebo C');
+});
+
 test('count scoring for an ANO/NE battery', () => {
   const task = {
     parts: [yesno('4.1', 'N'), yesno('4.2', 'N'), yesno('4.3', 'A'), yesno('4.4', 'N')],

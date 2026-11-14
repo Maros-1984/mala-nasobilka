@@ -19,7 +19,7 @@ from PIL import Image
 
 ZOOM = 2.0
 LEFT, RIGHT = 54, 562          # fixed horizontal window, same text scale in every crop
-TOP, BOTTOM = 30, 806          # page body without the page-number footer
+TOP, BOTTOM = 16, 806          # page body without the page-number footer
 MAX_GAP_PX = 34                # longer white bands get collapsed to this height
 LEFT_MARGIN_X = 85             # task numbers and headers start left of this
 
@@ -126,8 +126,8 @@ def region_parts(start, end, npages, bottoms=None):
     parts = []
     for p in range(p0, min(p1, npages - 1) + 1):
         bottom = bottoms[p] if bottoms else BOTTOM
-        a = y0 - 4 if p == p0 else TOP
-        b = y1 - 4 if p == p1 else bottom
+        a = y0 - 7 if p == p0 else TOP   # room for diacritics above capitals
+        b = y1 - 7 if p == p1 else bottom
         if b - a > 8:
             parts.append((p, max(a, TOP), min(b, bottom)))
     return parts

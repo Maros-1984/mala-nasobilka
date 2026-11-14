@@ -315,7 +315,7 @@ function markPart(part, r) {
   }
   row.classList.add(r.correct ? 'ok' : 'bad');
   for (const b of row.querySelectorAll('.opt')) {
-    if (b.dataset.value === part.answer) b.classList.add('right');
+    if (b.dataset.value === part.answer || part.accept?.includes(b.dataset.value)) b.classList.add('right');
   }
   const extra = part.type === 'set' && !r.correct ? ` (chyb: ${r.errors})` : '';
   verdict.replaceChildren(r.correct
