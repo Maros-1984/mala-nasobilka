@@ -73,6 +73,10 @@ export function createQueue(pool, { rng = Math.random, solved = new Set(), retry
         queue.splice(Math.min(retryGap, queue.length), 0, task);
       }
     },
+    /** The task after the current one, for prefetching. */
+    peekNext() {
+      return queue[1] || null;
+    },
     get solved() {
       return solved;
     },
